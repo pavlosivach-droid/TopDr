@@ -820,6 +820,34 @@ function renderLists(){
     </div>
   `).join('') || '<div class="small">Поки немає постачальників.</div>';
 }
+document.addEventListener('click', async (e) => {
+
+  const storeBtn = e.target.closest('[data-remove-store]');
+  const supplierBtn = e.target.closest('[data-remove-supplier]');
+
+  // 🏪 Магазин
+  if (storeBtn) {
+    const id = storeBtn.dataset.removeStore;
+
+    if (!confirm('Видалити магазин?')) return;
+
+    appState.stores = appState.stores.filter(s => s.id !== id);
+    await saveData();
+    renderLists();
+  }
+
+  // 🏭 Постачальник
+  if (supplierBtn) {
+    const id = supplierBtn.dataset.removeSupplier;
+
+    if (!confirm('Видалити постачальника?')) return;
+
+    appState.suppliers = appState.suppliers.filter(s => s.id !== id);
+    await saveData();
+    renderLists();
+  }
+
+});
 
 function renderAll(){
   renderOrders();
