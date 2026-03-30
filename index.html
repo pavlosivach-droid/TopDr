@@ -1,180 +1,1281 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>CRM</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TopDr CRM</title>
+  <style>
+    :root{
+      --bg:#08111f;
+      --panel:#0f1b31;
+      --panel2:#13243f;
+      --line:rgba(255,255,255,.08);
+      --text:#e6eefc;
+      --muted:#93a4c3;
+      --brand:#6d7cff;
+      --brand2:#22c55e;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+      --shadow: 0 18px 40px rgba(0,0,0,.32);
+      --radius:20px;
+      --radius2:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(109,124,255,.20), transparent 60%),
+        radial-gradient(800px 500px at 100% 0%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, #07101d 0%, #07101d 20%, #050b14 100%);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    .app{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: 280px 1fr;
+    }
+    .sidebar{
+      background: linear-gradient(180deg, rgba(15,27,49,.98), rgba(10,18,34,.98));
+      border-right:1px solid var(--line);
+      padding:22px 18px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+      padding:10px 12px 18px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:18px;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: linear-gradient(135deg, #6d7cff, #22c55e);
+      box-shadow: 0 10px 24px rgba(109,124,255,.35);
+      display:grid;place-items:center;font-weight:900;color:white;
+    }
+    .brand h1{font-size:18px;margin:0}
+    .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .nav{
+      display:flex;flex-direction:column;gap:8px;
+      margin-top:14px;
+    }
+    .nav button{
+      appearance:none;border:none;cursor:pointer;
+      background:transparent;color:var(--text);
+      padding:14px 14px;border-radius:14px;
+      display:flex;align-items:center;gap:12px;
+      text-align:left;font-size:14px;
+      transition:.2s ease;
+    }
+    .nav button:hover{background:rgba(255,255,255,.05)}
+    .nav button.active{
+      background: linear-gradient(135deg, rgba(109,124,255,.20), rgba(34,197,94,.12));
+      box-shadow: inset 0 0 0 1px rgba(109,124,255,.25);
+    }
+    .nav .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:var(--muted);flex:0 0 auto;
+    }
+    .nav button.active .dot{background:var(--brand)}
+    .sidebar-card{
+      margin-top:18px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+    }
+    .mini{
+      display:flex;justify-content:space-between;align-items:center;
+      gap:10px;
+      margin:8px 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;
+      padding:8px 10px;border-radius:999px;
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      font-size:12px;
+      border:1px solid var(--line);
+      white-space:nowrap;
+    }
+    .badge.ok{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22)}
+    .badge.warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.22)}
+    .content{
+      padding:22px;
+      width:100%;
+      min-width:0;
+    }
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .title h2{margin:0;font-size:28px;letter-spacing:.2px}
+    .title p{margin:6px 0 0;color:var(--muted)}
+    .actions{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    }
+    .search, .date, .select, .input, textarea{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:14px;
+      padding:12px 14px;
+      outline:none;
+      transition:.2s;
+    }
+    .search{min-width:320px}
+    .search:focus,.date:focus,.select:focus,.input:focus,textarea:focus{
+      border-color:rgba(109,124,255,.55);
+      box-shadow:0 0 0 3px rgba(109,124,255,.10);
+    }
+    .btn{
+      appearance:none;border:none;cursor:pointer;
+      padding:12px 16px;border-radius:14px;
+      font-weight:700;color:white;
+      background: linear-gradient(135deg, #6d7cff, #4f6bff);
+      box-shadow: 0 10px 22px rgba(79,107,255,.22);
+      transition:transform .15s ease, opacity .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.secondary{
+      background:rgba(255,255,255,.06);box-shadow:none;
+      border:1px solid var(--line);
+    }
+    .btn.green{background:linear-gradient(135deg,#22c55e,#0ea5e9)}
+    .btn.red{background:linear-gradient(135deg,#ef4444,#fb7185)}
+    .grid{
+      display:grid;
+      gap:14px;
+    }
+    .stats-grid{
+      grid-template-columns: repeat(6, minmax(0,1fr));
+      margin-bottom:14px;
+    }
+    .stat{
+      background:linear-gradient(180deg, rgba(19,36,63,.92), rgba(11,19,34,.92));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      min-height:110px;
+    }
+    .stat .label{color:var(--muted);font-size:12px;letter-spacing:.2px}
+    .stat .value{margin-top:10px;font-size:28px;font-weight:900}
+    .stat .sub{margin-top:8px;color:var(--muted);font-size:12px}
+    .panel{
+      background:linear-gradient(180deg, rgba(15,27,49,.92), rgba(10,18,34,.92));
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:16px;
+      margin-top:14px;
+      min-width:0;
+    }
+    .panel-header{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .panel-header h3{margin:0;font-size:18px}
+    .panel-header .muted{color:var(--muted);font-size:13px}
+    .filters{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    }
+    .filters .group{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .kanban{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(260px,1fr));
+      gap:14px;
+    }
+    .col{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:20px;
+      min-height:580px;
+      padding:12px;
+    }
+    .col-head{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:12px;
+    }
+    .col-title{display:flex;align-items:center;gap:10px;font-weight:800}
+    .count{
+      min-width:30px;height:30px;border-radius:999px;
+      display:grid;place-items:center;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      color:var(--text);
+      font-size:12px;
+    }
+    .drop-hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:10px;
+      text-align:center;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(25,42,73,.95), rgba(16,28,50,.98));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:14px;
+      margin-bottom:12px;
+      cursor:grab;
+      position:relative;
+      box-shadow: 0 12px 24px rgba(0,0,0,.18);
+    }
+    .card:active{cursor:grabbing}
+    .card-top{
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+    }
+    .card h4{margin:0;font-size:15px;line-height:1.3}
+    .card .meta{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.4}
+    .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+    .tag{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 8px;border-radius:999px;
+      font-size:11px;font-weight:700;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);
+      color:var(--text);
+    }
+    .tag.paid{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.22);color:#b8f8cc}
+    .tag.unpaid{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.22);color:#ffd0d0}
+    .tag.blue{background:rgba(109,124,255,.16);border-color:rgba(109,124,255,.22);color:#d9ddff}
+    .card-actions{
+      display:flex;gap:8px;flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .icon-btn{
+      border:none;cursor:pointer;
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid var(--line);
+      padding:8px 10px;border-radius:12px;
+      font-size:12px;
+    }
+    .icon-btn.danger{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.20)}
+    .icon-btn.green{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.20)}
+    .order-table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 10px;
+    }
+    .order-table th{
+      text-align:left;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      padding:0 12px 8px 12px;
+      white-space:nowrap;
+    }
+    .order-table td{
+      background:rgba(255,255,255,.04);
+      padding:14px 12px;
+      border-top:1px solid rgba(255,255,255,.05);
+      border-bottom:1px solid rgba(255,255,255,.05);
+      font-size:13px;
+      vertical-align:top;
+    }
+    .order-table tr td:first-child{border-radius:16px 0 0 16px;border-left:1px solid rgba(255,255,255,.05)}
+    .order-table tr td:last-child{border-radius:0 16px 16px 0;border-right:1px solid rgba(255,255,255,.05)}
+    .muted{color:var(--muted)}
+    .two-col{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+    }
+    .list-box{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      min-width:0;
+    }
+    .list-header{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px
+    }
+    .chips{
+      display:flex;flex-wrap:wrap;gap:8px;
+      margin-top:10px;
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+    }
+    .chip button{
+      border:none;background:transparent;color:#fb7185;cursor:pointer;font-size:14px;line-height:1
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+    .form-grid .full{grid-column:1 / -1}
+    .form-grid .span2{grid-column: span 2}
+    .field label{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      margin:0 0 6px 2px;
+    }
+    .field input,.field select,.field textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
+      outline:none;
+    }
+    .field textarea{min-height:92px;resize:vertical}
+    .form-actions{
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;
+      margin-top:12px;
+    }
+    .hidden{display:none !important}
+    .footer-note{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:8px;
+    }
 
-<style>
-body {
-  margin:0;
-  font-family: Arial;
-  background:#0f172a;
-  color:#fff;
-}
-
-h1 {
-  text-align:center;
-  padding:20px;
-}
-
-.container {
-  display:flex;
-  gap:15px;
-  padding:15px;
-  overflow-x:auto;
-}
-
-.column {
-  background:#1e293b;
-  padding:10px;
-  border-radius:10px;
-  width:300px;
-  min-height:400px;
-}
-
-.column h2 {
-  text-align:center;
-}
-
-.card {
-  background:#334155;
-  padding:10px;
-  margin:10px 0;
-  border-radius:10px;
-  cursor:grab;
-}
-
-.card small {
-  display:block;
-  color:#94a3b8;
-}
-
-.top {
-  padding:15px;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-input {
-  padding:8px;
-  border:none;
-  border-radius:5px;
-}
-
-button {
-  padding:10px;
-  background:#22c55e;
-  border:none;
-  border-radius:5px;
-  color:#fff;
-  cursor:pointer;
-}
-
-.stats {
-  padding:15px;
-}
-</style>
-
+    @media (max-width: 1280px){
+      .app{grid-template-columns:1fr}
+      .sidebar{
+        position:relative;height:auto;
+        border-right:none;border-bottom:1px solid var(--line);
+      }
+      .stats-grid{grid-template-columns: repeat(3, minmax(0,1fr))}
+      .kanban{grid-template-columns: repeat(2, minmax(260px,1fr))}
+      .two-col{grid-template-columns:1fr}
+    }
+    @media (max-width: 820px){
+      .content{padding:14px}
+      .search{min-width:100%}
+      .stats-grid{grid-template-columns: repeat(2, minmax(0,1fr))}
+      .kanban{grid-template-columns:1fr}
+      .form-grid{grid-template-columns:1fr}
+      .form-grid .span2{grid-column:auto}
+      .topbar{align-items:stretch}
+      .actions{width:100%}
+      .actions .btn,.actions .secondary,.actions .search,.actions .date{width:100%}
+      .order-table{display:block;overflow-x:auto;white-space:nowrap}
+    }
+  </style>
 </head>
 <body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">T</div>
+      <div>
+        <h1>TopDr CRM</h1>
+        <p>Sales board · dark mode</p>
+      </div>
+    </div>
 
-<h1>CRM</h1>
+    <div class="nav">
+      <button class="active" data-tab="dashboard"><span class="dot"></span> Дашборд</button>
+      <button data-tab="orders"><span class="dot"></span> Замовлення</button>
+      <button data-tab="lists"><span class="dot"></span> Постачальники / Магазини</button>
+      <button data-tab="backup"><span class="dot"></span> Резервна копія</button>
+    </div>
 
-<div class="top">
-<input id="product" placeholder="Товар">
-<input id="price" type="number" placeholder="Ціна">
-<input id="cost" type="number" placeholder="Закупка">
-<input id="ads" type="number" placeholder="Реклама">
-<button onclick="addOrder()">Додати</button>
+    <div class="sidebar-card">
+      <div class="mini"><span>Формат</span><span class="badge ok">GitHub Pages ready</span></div>
+      <div class="mini"><span>Збереження</span><span class="badge">localStorage</span></div>
+      <div class="mini"><span>Мобільний доступ</span><span class="badge warn">так</span></div>
+      <div class="mini"><span>API</span><span class="badge">готово під інтеграцію</span></div>
+      <div class="footer-note">Усі дані зберігаються в браузері. Потім можна підключити Prom API та базу.</div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div class="title">
+        <h2>CRM для продажів</h2>
+        <p>Замовлення, воронка, прибуток, реклама, постачальники та статистика за період.</p>
+      </div>
+      <div class="actions">
+        <input class="search" id="search" placeholder="Пошук: товар, клієнт, магазин, телефон..." />
+        <input class="date" id="dateFrom" type="date" />
+        <input class="date" id="dateTo" type="date" />
+        <button class="btn secondary" id="clearFilters">Скинути</button>
+        <button class="btn" id="openAdd">+ Замовлення</button>
+      </div>
+    </div>
+
+    <section id="dashboard">
+      <div class="grid stats-grid">
+        <div class="stat"><div class="label">Оборот</div><div class="value" id="mRevenue">0 ₴</div><div class="sub">за вибраний період</div></div>
+        <div class="stat"><div class="label">Прибуток</div><div class="value" id="mProfit">0 ₴</div><div class="sub">дохід - закупка - реклама</div></div>
+        <div class="stat"><div class="label">Реклама</div><div class="value" id="mAds">0 ₴</div><div class="sub">витрати на трафік</div></div>
+        <div class="stat"><div class="label">Замовлення</div><div class="value" id="mOrders">0</div><div class="sub">усього у фільтрі</div></div>
+        <div class="stat"><div class="label">Оплачені</div><div class="value" id="mPaid">0</div><div class="sub">підтверджені оплати</div></div>
+        <div class="stat"><div class="label">Середній чек</div><div class="value" id="mAov">0 ₴</div><div class="sub">середня ціна замовлення</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Воронка замовлень</h3>
+            <div class="muted">Перетягуй картки між колонками або редагуй у картці.</div>
+          </div>
+          <div class="filters">
+            <div class="group">
+              <button class="btn secondary" data-range="today">Сьогодні</button>
+              <button class="btn secondary" data-range="7">7 днів</button>
+              <button class="btn secondary" data-range="30">30 днів</button>
+              <button class="btn secondary" data-range="month">Цей місяць</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban" id="board"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Таблиця замовлень</h3>
+            <div class="muted">Повний список по фільтру.</div>
+          </div>
+          <div class="filters">
+            <span class="badge" id="filteredInfo">0 записів</span>
+          </div>
+        </div>
+        <div style="overflow:auto">
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Магазин</th>
+                <th>Клієнт</th>
+                <th>Телефон</th>
+                <th>Ціна</th>
+                <th>Закупка</th>
+                <th>Реклама</th>
+                <th>Прибуток</th>
+                <th>Постачальник</th>
+                <th>Статус</th>
+                <th>Оплата</th>
+                <th>Дії</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="lists" class="hidden">
+      <div class="two-col">
+        <div class="list-box">
+          <div class="list-header">
+            <div>
+              <h3>Постачальники</h3>
+              <div class="muted">Введи назву один раз — далі вибирай зі списку.</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label>Додати постачальника</label>
+              <input id="newSupplier" class="input" placeholder="Напр. Optima, Base, PromSupplier..." />
+            </div>
+            <div class="field full">
+              <button class="btn" id="addSupplierBtn" type="button">Додати постачальника</button>
+            </div>
+          </div>
+          <div class="chips" id="supplierChips"></div>
+        </div>
+
+        <div class="list-box">
+          <div class="list-header">
+            <div>
+              <h3>Магазини</h3>
+              <div class="muted">Тут зберігаються всі магазини, з яких приходять замовлення.</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label>Додати магазин</label>
+              <input id="newStore" class="input" placeholder="Напр. TopDr, GardenPro..." />
+            </div>
+            <div class="field full">
+              <button class="btn" id="addStoreBtn" type="button">Додати магазин</button>
+            </div>
+          </div>
+          <div class="chips" id="storeChips"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="backup" class="hidden">
+      <div class="two-col">
+        <div class="list-box">
+          <div class="list-header">
+            <div>
+              <h3>Резервна копія</h3>
+              <div class="muted">Експорт/імпорт усіх даних CRM.</div>
+            </div>
+          </div>
+          <div class="form-actions" style="justify-content:flex-start">
+            <button class="btn green" id="exportBtn" type="button">Експорт JSON</button>
+            <label class="btn secondary" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+              Імпорт JSON
+              <input id="importFile" type="file" accept="application/json" style="display:none">
+            </label>
+            <button class="btn red" id="resetBtn" type="button">Очистити все</button>
+          </div>
+          <p class="footer-note">Перед першою зміною краще зробити експорт. Потім можна зберігати бекапи на комп’ютер або Google Drive.</p>
+        </div>
+        <div class="list-box">
+          <div class="list-header">
+            <div>
+              <h3>Підготовка під API</h3>
+              <div class="muted">Уже є структура під майбутній пром-імпорт.</div>
+            </div>
+          </div>
+          <div class="badge ok">orders[] · suppliers[] · stores[]</div>
+          <p class="footer-note">Після підключення API просто замінюємо джерело даних, а інтерфейс лишається той самий.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
 
-<div class="container">
-
-<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="new">
-<h2>Нові</h2>
+<!-- Modal -->
+<div id="modal" class="hidden" style="position:fixed;inset:0;background:rgba(3,8,20,.72);backdrop-filter: blur(8px);z-index:50;padding:18px;overflow:auto;">
+  <div style="max-width:1080px;margin:4vh auto;background:linear-gradient(180deg, rgba(15,27,49,.98), rgba(10,18,34,.98));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:18px;">
+    <div class="panel-header">
+      <div>
+        <h3 id="modalTitle" style="margin:0">Додати замовлення</h3>
+        <div class="muted">Усі поля можна змінити після створення.</div>
+      </div>
+      <button class="btn secondary" id="closeModal" type="button">✕ Закрити</button>
+    </div>
+    <form id="orderForm">
+      <input type="hidden" id="orderId" />
+      <div class="form-grid">
+        <div class="field">
+          <label>Товар *</label>
+          <input id="product" required placeholder="Назва товару" />
+        </div>
+        <div class="field">
+          <label>Магазин *</label>
+          <input id="store" list="storesList" required placeholder="Назва магазину" />
+        </div>
+        <div class="field">
+          <label>Клієнт *</label>
+          <input id="client" required placeholder="Ім'я клієнта" />
+        </div>
+        <div class="field">
+          <label>Телефон *</label>
+          <input id="phone" required placeholder="+380..." />
+        </div>
+        <div class="field">
+          <label>Місто</label>
+          <input id="city" placeholder="Напр. Київ" />
+        </div>
+        <div class="field">
+          <label>Доставка</label>
+          <input id="delivery" placeholder="Нова Пошта / Укрпошта..." />
+        </div>
+        <div class="field">
+          <label>Ціна *</label>
+          <input id="price" type="number" min="0" step="0.01" required />
+        </div>
+        <div class="field">
+          <label>Закупка *</label>
+          <input id="cost" type="number" min="0" step="0.01" required />
+        </div>
+        <div class="field">
+          <label>Реклама *</label>
+          <input id="ads" type="number" min="0" step="0.01" required />
+        </div>
+        <div class="field">
+          <label>Рекламний канал</label>
+          <input id="adSource" placeholder="Prom, Meta, Google, OLX..." />
+        </div>
+        <div class="field">
+          <label>Постачальник</label>
+          <input id="supplier" list="suppliersList" placeholder="Обрати або вписати" />
+        </div>
+        <div class="field">
+          <label>Дата</label>
+          <input id="date" type="date" />
+        </div>
+        <div class="field">
+          <label>Статус</label>
+          <select id="status" class="select">
+            <option value="new">Новий</option>
+            <option value="processing">В обробці</option>
+            <option value="shipped">Відправлено</option>
+            <option value="done">Завершено</option>
+            <option value="cancelled">Відмова</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Оплата</label>
+          <select id="paid" class="select">
+            <option value="false">Не оплачено</option>
+            <option value="true">Оплачено</option>
+          </select>
+        </div>
+        <div class="field span2">
+          <label>Коментар</label>
+          <textarea id="notes" placeholder="Будь-яка примітка по замовленню..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn secondary" type="button" id="cancelEdit">Скасувати</button>
+        <button class="btn" type="submit" id="saveOrderBtn">Зберегти</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="work">
-<h2>В роботі</h2>
-</div>
-
-<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="sent">
-<h2>Відправлено</h2>
-</div>
-
-<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="done">
-<h2>Завершено</h2>
-</div>
-
-</div>
-
-<div class="stats" id="stats"></div>
+<datalist id="suppliersList"></datalist>
+<datalist id="storesList"></datalist>
 
 <script>
-let data = JSON.parse(localStorage.getItem('crm2') || '[]');
+(() => {
+  const STORAGE_KEY = 'topdr_crm_v1';
 
-function save() {
-  localStorage.setItem('crm2', JSON.stringify(data));
-}
-
-function render() {
-  document.querySelectorAll('.column').forEach(col => col.innerHTML = "<h2>"+col.querySelector("h2").innerText+"</h2>");
-
-  let profit=0, revenue=0, ads=0;
-
-  data.forEach((d,i) => {
-    let p = d.price - d.cost - d.ads;
-    profit += p;
-    revenue += d.price;
-    ads += d.ads;
-
-    let card = document.createElement('div');
-    card.className = 'card';
-    card.draggable = true;
-    card.ondragstart = e => e.dataTransfer.setData("id", i);
-
-    card.innerHTML = `
-      <b>${d.product}</b>
-      <small>💰 ${d.price} | Прибуток: ${p}</small>
-    `;
-
-    document.querySelector(`[data-status=${d.status}]`).appendChild(card);
-  });
-
-  document.getElementById('stats').innerHTML = `
-  Оборот: ${revenue} грн<br>
-  Прибуток: ${profit} грн<br>
-  Реклама: ${ads} грн`;
-}
-
-function addOrder() {
-  let obj = {
-    product: product.value,
-    price:+price.value,
-    cost:+cost.value,
-    ads:+ads.value,
-    status:'new'
+  const state = {
+    data: {
+      orders: [],
+      suppliers: ['Default Supplier'],
+      stores: ['TopDr'],
+    },
+    filters: {
+      search: '',
+      from: '',
+      to: '',
+    },
+    activeTab: 'dashboard',
+    editingId: null,
   };
 
-  data.push(obj);
-  save();
-  render();
-}
+  const els = {
+    board: document.getElementById('board'),
+    tableBody: document.getElementById('tableBody'),
+    filteredInfo: document.getElementById('filteredInfo'),
+    search: document.getElementById('search'),
+    from: document.getElementById('dateFrom'),
+    to: document.getElementById('dateTo'),
+    mRevenue: document.getElementById('mRevenue'),
+    mProfit: document.getElementById('mProfit'),
+    mAds: document.getElementById('mAds'),
+    mOrders: document.getElementById('mOrders'),
+    mPaid: document.getElementById('mPaid'),
+    mAov: document.getElementById('mAov'),
+    modal: document.getElementById('modal'),
+    modalTitle: document.getElementById('modalTitle'),
+    orderForm: document.getElementById('orderForm'),
+    openAdd: document.getElementById('openAdd'),
+    closeModal: document.getElementById('closeModal'),
+    cancelEdit: document.getElementById('cancelEdit'),
+    orderId: document.getElementById('orderId'),
+    product: document.getElementById('product'),
+    store: document.getElementById('store'),
+    client: document.getElementById('client'),
+    phone: document.getElementById('phone'),
+    city: document.getElementById('city'),
+    delivery: document.getElementById('delivery'),
+    price: document.getElementById('price'),
+    cost: document.getElementById('cost'),
+    ads: document.getElementById('ads'),
+    adSource: document.getElementById('adSource'),
+    supplier: document.getElementById('supplier'),
+    date: document.getElementById('date'),
+    status: document.getElementById('status'),
+    paid: document.getElementById('paid'),
+    notes: document.getElementById('notes'),
+    supplierChips: document.getElementById('supplierChips'),
+    storeChips: document.getElementById('storeChips'),
+    suppliersList: document.getElementById('suppliersList'),
+    storesList: document.getElementById('storesList'),
+    newSupplier: document.getElementById('newSupplier'),
+    newStore: document.getElementById('newStore'),
+    addSupplierBtn: document.getElementById('addSupplierBtn'),
+    addStoreBtn: document.getElementById('addStoreBtn'),
+    exportBtn: document.getElementById('exportBtn'),
+    importFile: document.getElementById('importFile'),
+    resetBtn: document.getElementById('resetBtn'),
+    clearFilters: document.getElementById('clearFilters'),
+  };
 
-function allowDrop(e){e.preventDefault();}
+  const statusMeta = {
+    new: { label: 'Новий', color: 'blue' },
+    processing: { label: 'В обробці', color: 'warn' },
+    shipped: { label: 'Відправлено', color: 'ok' },
+    done: { label: 'Завершено', color: 'ok' },
+    cancelled: { label: 'Відмова', color: 'danger' },
+  };
 
-function drop(e){
-  e.preventDefault();
-  let id = e.dataTransfer.getData("id");
-  let status = e.currentTarget.dataset.status;
-  data[id].status = status;
-  save();
-  render();
-}
+  function todayISO() {
+    return new Date().toISOString().slice(0,10);
+  }
 
-render();
+  function monthStartISO() {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10);
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+  }
+
+  function load() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        state.data.orders = Array.isArray(parsed.orders) ? parsed.orders : [];
+        state.data.suppliers = Array.isArray(parsed.suppliers) ? parsed.suppliers : [];
+        state.data.stores = Array.isArray(parsed.stores) ? parsed.stores : [];
+      } catch (e) {}
+    }
+
+    if (!state.data.suppliers.length) state.data.suppliers = ['Default Supplier'];
+    if (!state.data.stores.length) state.data.stores = ['TopDr'];
+  }
+
+  function money(value) {
+    const n = Number(value || 0);
+    return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Math.round(n)) + ' ₴';
+  }
+
+  function normalize(s) {
+    return (s || '').toString().trim().toLowerCase();
+  }
+
+  function orderProfit(o) {
+    return Number(o.price || 0) - Number(o.cost || 0) - Number(o.ads || 0);
+  }
+
+  function currentFiltered() {
+    const q = normalize(state.filters.search);
+    const from = state.filters.from;
+    const to = state.filters.to;
+
+    return state.data.orders.filter(o => {
+      const hay = [
+        o.product, o.store, o.client, o.phone, o.city, o.delivery,
+        o.adSource, o.supplier, o.notes, o.status, o.paid ? 'оплачено' : 'не оплачено'
+      ].join(' ').toLowerCase();
+
+      if (q && !hay.includes(q)) return false;
+      if (from && o.date && o.date < from) return false;
+      if (to && o.date && o.date > to) return false;
+      return true;
+    }).sort((a,b) => (b.date || '').localeCompare(a.date || '') || (Number(b.createdAt) - Number(a.createdAt)));
+  }
+
+  function statusFiltered(list, status) {
+    return list.filter(o => o.status === status);
+  }
+
+  function fillDatalists() {
+    els.suppliersList.innerHTML = state.data.suppliers
+      .filter(Boolean)
+      .map(s => `<option value="${escapeHtml(s)}"></option>`)
+      .join('');
+    els.storesList.innerHTML = state.data.stores
+      .filter(Boolean)
+      .map(s => `<option value="${escapeHtml(s)}"></option>`)
+      .join('');
+  }
+
+  function renderChips() {
+    const chipHTML = (items, kind) => items.map(item => `
+      <span class="chip">${escapeHtml(item)} <button title="Видалити" data-remove="${kind}:${encodeURIComponent(item)}">×</button></span>
+    `).join('');
+
+    els.supplierChips.innerHTML = chipHTML(state.data.suppliers, 'supplier');
+    els.storeChips.innerHTML = chipHTML(state.data.stores, 'store');
+
+    document.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const [kind, encoded] = btn.dataset.remove.split(':');
+        const value = decodeURIComponent(encoded);
+        if (kind === 'supplier') state.data.suppliers = state.data.suppliers.filter(v => v !== value);
+        if (kind === 'store') state.data.stores = state.data.stores.filter(v => v !== value);
+        save();
+        renderAll();
+      });
+    });
+  }
+
+  function renderStats(list) {
+    const revenue = list.reduce((sum, o) => sum + Number(o.price || 0), 0);
+    const ads = list.reduce((sum, o) => sum + Number(o.ads || 0), 0);
+    const profit = list.reduce((sum, o) => sum + orderProfit(o), 0);
+    const paid = list.filter(o => String(o.paid) === 'true').length;
+    const orders = list.length;
+    const aov = orders ? revenue / orders : 0;
+
+    els.mRevenue.textContent = money(revenue);
+    els.mProfit.textContent = money(profit);
+    els.mAds.textContent = money(ads);
+    els.mOrders.textContent = orders;
+    els.mPaid.textContent = paid;
+    els.mAov.textContent = money(aov);
+    els.filteredInfo.textContent = `${orders} записів`;
+  }
+
+  function renderBoard(list) {
+    const cols = ['new', 'processing', 'shipped', 'done', 'cancelled'];
+    els.board.innerHTML = cols.map(status => {
+      const items = statusFiltered(list, status);
+      return `
+        <div class="col" data-col="${status}">
+          <div class="col-head">
+            <div class="col-title">${statusMeta[status].label} <span class="count">${items.length}</span></div>
+          </div>
+          <div class="drop-hint">Перетягни картку сюди</div>
+          <div class="cards">
+            ${items.map(o => orderCardHTML(o)).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.querySelectorAll('.card').forEach(card => {
+      const id = card.dataset.id;
+      card.addEventListener('dragstart', ev => {
+        ev.dataTransfer.setData('text/plain', id);
+      });
+      card.querySelectorAll('[data-act]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const act = btn.dataset.act;
+          if (act === 'edit') openEdit(id);
+          if (act === 'del') deleteOrder(id);
+        });
+      });
+      const statusSelect = card.querySelector('select[data-status-select]');
+      statusSelect?.addEventListener('change', (e) => {
+        updateOrder(id, { status: e.target.value });
+      });
+      const paidSelect = card.querySelector('select[data-paid-select]');
+      paidSelect?.addEventListener('change', (e) => {
+        updateOrder(id, { paid: e.target.value === 'true' });
+      });
+    });
+
+    document.querySelectorAll('.col').forEach(col => {
+      col.addEventListener('dragover', e => e.preventDefault());
+      col.addEventListener('drop', e => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        const status = col.dataset.col;
+        updateOrder(id, { status });
+      });
+    });
+  }
+
+  function orderCardHTML(o) {
+    const profit = orderProfit(o);
+    const paid = String(o.paid) === 'true';
+    const stat = statusMeta[o.status] || statusMeta.new;
+    return `
+      <div class="card" draggable="true" data-id="${o.id}">
+        <div class="card-top">
+          <div style="min-width:0">
+            <h4>${escapeHtml(o.product || 'Без назви')}</h4>
+            <div class="meta">
+              ${escapeHtml(o.client || '-')}${o.phone ? ' · ' + escapeHtml(o.phone) : ''}<br>
+              ${escapeHtml(o.store || '-')}${o.supplier ? ' · ' + escapeHtml(o.supplier) : ''}
+            </div>
+          </div>
+          <span class="tag ${stat.color}">${stat.label}</span>
+        </div>
+        <div class="tag-row">
+          <span class="tag blue">Ціна: ${money(o.price)}</span>
+          <span class="tag">Прибуток: ${money(profit)}</span>
+          <span class="tag ${paid ? 'paid' : 'unpaid'}">${paid ? 'Оплачено' : 'Не оплачено'}</span>
+        </div>
+        <div class="meta" style="margin-top:10px">
+          ${o.city ? escapeHtml(o.city) + ' · ' : ''}${o.delivery ? escapeHtml(o.delivery) + ' · ' : ''}${escapeHtml(o.date || '')}
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn green" data-act="edit">Редагувати</button>
+          <button class="icon-btn danger" data-act="del">Видалити</button>
+        </div>
+        <div class="card-actions">
+          <select data-status-select class="select" style="flex:1;min-width:0">
+            ${Object.entries(statusMeta).map(([k,v]) => `<option value="${k}" ${k===o.status?'selected':''}>${v.label}</option>`).join('')}
+          </select>
+          <select data-paid-select class="select" style="width:140px">
+            <option value="false" ${String(o.paid) === 'false' ? 'selected' : ''}>Не оплачено</option>
+            <option value="true" ${String(o.paid) === 'true' ? 'selected' : ''}>Оплачено</option>
+          </select>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTable(list) {
+    els.tableBody.innerHTML = list.map(o => {
+      const profit = orderProfit(o);
+      const stat = statusMeta[o.status] || statusMeta.new;
+      return `
+        <tr>
+          <td>${escapeHtml(o.date || '')}</td>
+          <td>${escapeHtml(o.product || '')}</td>
+          <td>${escapeHtml(o.store || '')}</td>
+          <td>${escapeHtml(o.client || '')}</td>
+          <td>${escapeHtml(o.phone || '')}</td>
+          <td>${money(o.price)}</td>
+          <td>${money(o.cost)}</td>
+          <td>${money(o.ads)}</td>
+          <td>${money(profit)}</td>
+          <td>${escapeHtml(o.supplier || '')}</td>
+          <td>${stat.label}</td>
+          <td>${String(o.paid) === 'true' ? 'Оплачено' : 'Не оплачено'}</td>
+          <td>
+            <div class="card-actions" style="margin:0">
+              <button class="icon-btn green" data-act="edit" data-id="${o.id}">Ред.</button>
+              <button class="icon-btn danger" data-act="del" data-id="${o.id}">×</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    document.querySelectorAll('#tableBody [data-act]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if (btn.dataset.act === 'edit') openEdit(id);
+        if (btn.dataset.act === 'del') deleteOrder(id);
+      });
+    });
+  }
+
+  function renderAll() {
+    fillDatalists();
+    renderChips();
+    const list = currentFiltered();
+    renderStats(list);
+    renderBoard(list);
+    renderTable(list);
+    attachColDropHints();
+  }
+
+  function attachColDropHints() {
+    document.querySelectorAll('.col').forEach(col => {
+      col.addEventListener('dragover', (e) => e.preventDefault());
+      col.addEventListener('drop', handleDrop);
+    });
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const status = e.currentTarget.dataset.col;
+    updateOrder(id, {status});
+  }
+
+  function openModal(mode = 'add') {
+    els.modal.classList.remove('hidden');
+    els.modalTitle.textContent = mode === 'edit' ? 'Редагувати замовлення' : 'Додати замовлення';
+  }
+
+  function closeModal() {
+    els.modal.classList.add('hidden');
+    state.editingId = null;
+    els.orderForm.reset();
+    els.orderId.value = '';
+    els.date.value = todayISO();
+    els.status.value = 'new';
+    els.paid.value = 'false';
+  }
+
+  function openAddForm(prefill = {}) {
+    state.editingId = null;
+    els.orderId.value = '';
+    els.product.value = prefill.product || '';
+    els.store.value = prefill.store || '';
+    els.client.value = prefill.client || '';
+    els.phone.value = prefill.phone || '';
+    els.city.value = prefill.city || '';
+    els.delivery.value = prefill.delivery || '';
+    els.price.value = prefill.price ?? '';
+    els.cost.value = prefill.cost ?? '';
+    els.ads.value = prefill.ads ?? 0;
+    els.adSource.value = prefill.adSource || '';
+    els.supplier.value = prefill.supplier || '';
+    els.date.value = prefill.date || todayISO();
+    els.status.value = prefill.status || 'new';
+    els.paid.value = String(prefill.paid ?? false);
+    els.notes.value = prefill.notes || '';
+    openModal('add');
+  }
+
+  function openEdit(id) {
+    const o = state.data.orders.find(x => x.id === id);
+    if (!o) return;
+    state.editingId = id;
+    els.orderId.value = id;
+    els.product.value = o.product || '';
+    els.store.value = o.store || '';
+    els.client.value = o.client || '';
+    els.phone.value = o.phone || '';
+    els.city.value = o.city || '';
+    els.delivery.value = o.delivery || '';
+    els.price.value = o.price ?? 0;
+    els.cost.value = o.cost ?? 0;
+    els.ads.value = o.ads ?? 0;
+    els.adSource.value = o.adSource || '';
+    els.supplier.value = o.supplier || '';
+    els.date.value = o.date || todayISO();
+    els.status.value = o.status || 'new';
+    els.paid.value = String(o.paid ?? false);
+    els.notes.value = o.notes || '';
+    openModal('edit');
+  }
+
+  function buildOrderFromForm() {
+    const supplier = els.supplier.value.trim();
+    const store = els.store.value.trim();
+    const order = {
+      id: state.editingId || uid(),
+      product: els.product.value.trim(),
+      store,
+      client: els.client.value.trim(),
+      phone: els.phone.value.trim(),
+      city: els.city.value.trim(),
+      delivery: els.delivery.value.trim(),
+      price: Number(els.price.value || 0),
+      cost: Number(els.cost.value || 0),
+      ads: Number(els.ads.value || 0),
+      adSource: els.adSource.value.trim(),
+      supplier,
+      date: els.date.value || todayISO(),
+      status: els.status.value,
+      paid: els.paid.value === 'true',
+      notes: els.notes.value.trim(),
+      createdAt: Date.now(),
+    };
+
+    if (supplier && !state.data.suppliers.includes(supplier)) state.data.suppliers.unshift(supplier);
+    if (store && !state.data.stores.includes(store)) state.data.stores.unshift(store);
+    return order;
+  }
+
+  function saveOrder(order) {
+    const idx = state.data.orders.findIndex(x => x.id === order.id);
+    if (idx >= 0) state.data.orders[idx] = { ...state.data.orders[idx], ...order };
+    else state.data.orders.unshift(order);
+    save();
+    renderAll();
+  }
+
+  function updateOrder(id, patch) {
+    const idx = state.data.orders.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    state.data.orders[idx] = { ...state.data.orders[idx], ...patch };
+    save();
+    renderAll();
+  }
+
+  function deleteOrder(id) {
+    if (!confirm('Видалити замовлення?')) return;
+    state.data.orders = state.data.orders.filter(x => x.id !== id);
+    save();
+    renderAll();
+  }
+
+  function addSimpleListItem(kind, value) {
+    const v = value.trim();
+    if (!v) return;
+    const key = kind === 'supplier' ? 'suppliers' : 'stores';
+    if (!state.data[key].includes(v)) {
+      state.data[key].unshift(v);
+      save();
+      renderAll();
+    }
+  }
+
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `topdr-crm-backup-${todayISO()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!parsed || typeof parsed !== 'object') throw new Error('bad');
+        state.data.orders = Array.isArray(parsed.orders) ? parsed.orders : [];
+        state.data.suppliers = Array.isArray(parsed.suppliers) ? parsed.suppliers : ['Default Supplier'];
+        state.data.stores = Array.isArray(parsed.stores) ? parsed.stores : ['TopDr'];
+        save();
+        renderAll();
+        alert('Імпорт успішний ✅');
+      } catch (e) {
+        alert('Не вдалося імпортувати JSON');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function setRange(range) {
+    const now = new Date();
+    if (range === 'today') {
+      const iso = todayISO();
+      state.filters.from = iso;
+      state.filters.to = iso;
+    } else if (range === '7') {
+      const from = new Date(now); from.setDate(now.getDate() - 6);
+      state.filters.from = from.toISOString().slice(0,10);
+      state.filters.to = todayISO();
+    } else if (range === '30') {
+      const from = new Date(now); from.setDate(now.getDate() - 29);
+      state.filters.from = from.toISOString().slice(0,10);
+      state.filters.to = todayISO();
+    } else if (range === 'month') {
+      state.filters.from = monthStartISO();
+      state.filters.to = todayISO();
+    }
+    els.from.value = state.filters.from;
+    els.to.value = state.filters.to;
+    renderAll();
+  }
+
+  function clearFilters() {
+    state.filters.search = '';
+    state.filters.from = '';
+    state.filters.to = '';
+    els.search.value = '';
+    els.from.value = '';
+    els.to.value = '';
+    renderAll();
+  }
+
+  function showTab(tab) {
+    state.activeTab = tab;
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.getElementById('dashboard').classList.toggle('hidden', tab !== 'dashboard');
+    document.getElementById('lists').classList.toggle('hidden', tab !== 'lists');
+    document.getElementById('backup').classList.toggle('hidden', tab !== 'backup');
+  }
+
+  function escapeHtml(str) {
+    return (str ?? '').toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function uid() {
+    return 'o_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+  }
+
+  // Events
+  els.openAdd.addEventListener('click', () => openAddForm());
+  els.closeModal.addEventListener('click', closeModal);
+  els.cancelEdit.addEventListener('click', closeModal);
+  els.modal.addEventListener('click', (e) => { if (e.target === els.modal) closeModal(); });
+
+  els.orderForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const order = buildOrderFromForm();
+    saveOrder(order);
+    closeModal();
+  });
+
+  els.search.addEventListener('input', () => {
+    state.filters.search = els.search.value;
+    renderAll();
+  });
+  els.from.addEventListener('change', () => {
+    state.filters.from = els.from.value;
+    renderAll();
+  });
+  els.to.addEventListener('change', () => {
+    state.filters.to = els.to.value;
+    renderAll();
+  });
+  els.clearFilters.addEventListener('click', clearFilters);
+
+  document.querySelectorAll('[data-range]').forEach(btn => {
+    btn.addEventListener('click', () => setRange(btn.dataset.range));
+  });
+
+  document.querySelectorAll('.nav button').forEach(btn => {
+    btn.addEventListener('click', () => showTab(btn.dataset.tab));
+  });
+
+  els.addSupplierBtn.addEventListener('click', () => {
+    addSimpleListItem('supplier', els.newSupplier.value);
+    els.newSupplier.value = '';
+  });
+
+  els.addStoreBtn.addEventListener('click', () => {
+    addSimpleListItem('store', els.newStore.value);
+    els.newStore.value = '';
+  });
+
+  els.exportBtn.addEventListener('click', exportJSON);
+  els.importFile.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) importJSON(file);
+    e.target.value = '';
+  });
+  els.resetBtn.addEventListener('click', () => {
+    if (!confirm('Очистити всі дані?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state.data = { orders: [], suppliers: ['Default Supplier'], stores: ['TopDr'] };
+    renderAll();
+  });
+
+  // Seed data for first run
+  function seedIfEmpty() {
+    if (state.data.orders.length) return;
+    const demo = [
+      { product:'Гойдалка садова 4 місна', store:'TopDr', client:'Іван Петренко', phone:'+380671112233', city:'Київ', delivery:'Нова Пошта', price:15990, cost:10400, ads:1200, adSource:'Prom', supplier:'GardenPro', date:todayISO(), status:'new', paid:false, notes:'Передзвонити після 18:00' },
+      { product:'Ігрове крісло GT', store:'TopDr', client:'Марія К.', phone:'+380931112244', city:'Львів', delivery:'Укрпошта', price:6990, cost:4200, ads:500, adSource:'Prom', supplier:'OfficeLine', date:todayISO(), status:'processing', paid:true, notes:'' },
+      { product:'Батут 305 см', store:'TopDr', client:'Олег', phone:'+380991112255', city:'Одеса', delivery:'Нова Пошта', price:12490, cost:8500, ads:800, adSource:'Prom', supplier:'SportHub', date:todayISO(), status:'shipped', paid:false, notes:'Доставка на відділення' },
+      { product:'Крапельний полив', store:'TopDr', client:'Аліна', phone:'+380501112266', city:'Дніпро', delivery:'Нова Пошта', price:2490, cost:1090, ads:220, adSource:'Prom', supplier:'AgroLine', date:todayISO(), status:'done', paid:true, notes:'' },
+    ];
+    state.data.orders = demo.map(d => ({ ...d, id: uid(), createdAt: Date.now() - Math.floor(Math.random()*1000000) }));
+    state.data.suppliers = ['GardenPro','OfficeLine','SportHub','AgroLine','Default Supplier'];
+    state.data.stores = ['TopDr','Main Store'];
+    save();
+  }
+
+  seedIfEmpty();
+  load();
+  renderAll();
+  els.date.value = todayISO();
+
+})();
 </script>
-
 </body>
 </html>
