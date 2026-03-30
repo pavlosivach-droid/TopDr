@@ -1,203 +1,1303 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>TopDr CRM v3</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TopDr CRM v4</title>
 <style>
-body { background:#0f172a; color:white; font-family:Arial; margin:0; }
-.container { padding:20px; }
-h1 { text-align:center; }
+  :root{
+    --bg:#0b1020;
+    --panel:#111a2d;
+    --panel2:#17213a;
+    --panel3:#1d2945;
+    --line:rgba(255,255,255,.08);
+    --text:#eaf1ff;
+    --muted:#93a4c7;
+    --accent:#4f8cff;
+    --accent2:#22c55e;
+    --danger:#ef4444;
+    --warn:#f59e0b;
+    --ok:#14b8a6;
+    --shadow:0 20px 50px rgba(0,0,0,.35);
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(79,140,255,.18), transparent 24%),
+      radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 22%),
+      var(--bg);
+    color:var(--text);
+  }
+  button,input,select,textarea{font:inherit}
+  .hidden{display:none !important}
+  .btn{
+    border:none; border-radius:12px; padding:10px 14px; cursor:pointer;
+    color:#fff; background:var(--panel3);
+    transition:.15s ease; box-shadow:none;
+  }
+  .btn:hover{transform:translateY(-1px); filter:brightness(1.05)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),#6a5cff)}
+  .btn.success{background:linear-gradient(135deg,var(--accent2),#16a34a)}
+  .btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626)}
+  .btn.ghost{background:transparent; border:1px solid var(--line)}
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 10px; border-radius:999px; background:#22304e;
+    color:#dbe6ff; font-size:12px; white-space:nowrap;
+  }
+  .pill.ok{background:rgba(34,197,94,.15); color:#8df0ad}
+  .pill.warn{background:rgba(245,158,11,.14); color:#ffd28b}
+  .pill.bad{background:rgba(239,68,68,.14); color:#ffb1b1}
+  .pill.info{background:rgba(79,140,255,.15); color:#a9c8ff}
+  .field{display:flex; flex-direction:column; gap:8px}
+  .field label{color:var(--muted); font-size:13px}
+  .field input,.field select,.field textarea{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line);
+    background:#0d1526; color:var(--text); outline:none;
+  }
+  .field textarea{min-height:92px; resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{
+    border-color:rgba(79,140,255,.7); box-shadow:0 0 0 3px rgba(79,140,255,.12);
+  }
 
-input, select {
-  padding:8px; margin:5px; border-radius:6px; border:none;
-}
+  /* LOGIN */
+  .login-wrap{
+    min-height:100vh; display:grid; place-items:center; padding:24px;
+  }
+  .login-card{
+    width:min(460px,100%); padding:28px; border-radius:24px; 
+    background:linear-gradient(180deg, rgba(24,35,58,.96), rgba(17,26,45,.98));
+    border:1px solid var(--line); box-shadow:var(--shadow);
+  }
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:22px}
+  .brand-badge{
+    width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+    font-weight:900;background:linear-gradient(135deg,var(--accent),#8b5cf6);
+    box-shadow:0 12px 30px rgba(79,140,255,.32)
+  }
+  .brand h1{margin:0;font-size:22px}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .login-note{
+    margin-top:14px;padding:12px 14px;border-radius:14px;
+    background:rgba(79,140,255,.08); border:1px solid rgba(79,140,255,.18);
+    color:var(--muted); font-size:13px; line-height:1.45;
+  }
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap}
 
-button {
-  padding:8px 12px; border:none; border-radius:6px;
-  background:#3b82f6; color:white; cursor:pointer;
-}
+  /* APP */
+  .app{
+    display:grid;
+    grid-template-columns: 270px 1fr;
+    min-height:100vh;
+  }
+  .sidebar{
+    position:sticky; top:0; height:100vh; overflow:auto;
+    background:linear-gradient(180deg, rgba(17,26,45,.98), rgba(13,21,38,.99));
+    border-right:1px solid var(--line); padding:18px 14px;
+  }
+  .nav{display:flex; flex-direction:column; gap:8px}
+  .nav button{
+    text-align:left; width:100%; padding:12px 14px; border-radius:14px;
+    border:1px solid transparent; background:transparent; color:var(--text);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    cursor:pointer;
+  }
+  .nav button:hover{background:rgba(255,255,255,.04)}
+  .nav button.active{
+    background:linear-gradient(135deg, rgba(79,140,255,.18), rgba(79,140,255,.08));
+    border-color:rgba(79,140,255,.25)
+  }
+  .nav .hint{color:var(--muted); font-size:12px}
 
-table {
-  width:100%; margin-top:20px; border-collapse: collapse;
-}
+  .main{padding:18px; min-width:0}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    flex-wrap:wrap; margin-bottom:16px;
+  }
+  .title-box h2{margin:0;font-size:28px}
+  .title-box p{margin:4px 0 0;color:var(--muted);font-size:13px}
+  .panel{
+    background:linear-gradient(180deg, rgba(24,35,58,.94), rgba(17,26,45,.96));
+    border:1px solid var(--line);
+    border-radius:22px; box-shadow:var(--shadow);
+  }
 
-td, th {
-  padding:10px; border-bottom:1px solid #1e293b;
-}
+  .section{display:none}
+  .section.active{display:block}
 
-tr:hover { background:#1e293b; cursor:pointer; }
+  /* ORDERS */
+  .orders-toolbar{
+    display:grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+    gap:10px; padding:14px;
+  }
+  .orders-toolbar .field{margin:0}
+  .orders-toolbar .field input,.orders-toolbar .field select{padding:11px 12px}
+  .toolbar-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
 
-.modal {
-  position:fixed; top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.7);
-  display:none; justify-content:center; align-items:center;
-}
+  .filters{
+    display:grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr auto;
+    gap:10px; padding:0 14px 14px;
+  }
 
-.modal-content {
-  background:#1e293b; padding:20px;
-  border-radius:10px; width:320px;
-}
+  .table-wrap{
+    overflow:auto; border-radius:18px; border:1px solid var(--line);
+    background:rgba(7,12,22,.18)
+  }
+  table{width:100%; border-collapse:collapse; min-width:1500px}
+  thead th{
+    position:sticky; top:0; z-index:1;
+    background:#10192b; color:#c7d5f5; text-align:left; font-size:12px;
+    padding:14px 12px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  tbody td{
+    padding:12px; border-bottom:1px solid rgba(255,255,255,.05);
+    color:#e7eeff; font-size:13px; vertical-align:top;
+  }
+  tbody tr:hover{background:rgba(255,255,255,.03); cursor:pointer}
+  .small{color:var(--muted); font-size:12px}
+  .actions{display:flex; gap:8px; flex-wrap:wrap}
+  .inline-select{
+    background:#10192b; color:var(--text); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; padding:8px 10px;
+  }
+  .status-bar{display:flex; flex-wrap:wrap; gap:8px}
+  .status-btn{
+    border:none; border-radius:999px; padding:6px 10px; cursor:pointer;
+    color:#dbe6ff; background:#22304e; font-size:12px;
+  }
+  .status-btn.active.new{background:rgba(79,140,255,.22)}
+  .status-btn.active.work{background:rgba(245,158,11,.22)}
+  .status-btn.active.sent{background:rgba(14,165,233,.22)}
+  .status-btn.active.done{background:rgba(34,197,94,.22)}
+  .status-btn.active.cancel{background:rgba(239,68,68,.22)}
+  .ttn-chip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px}
+  .ttn-none{background:#22304e; color:#dbe6ff}
+  .ttn-new{background:rgba(245,158,11,.15); color:#ffd28b}
+  .ttn-way{background:rgba(59,130,246,.18); color:#abd1ff}
+  .ttn-received{background:rgba(34,197,94,.15); color:#8df0ad}
+
+  /* ANALYTICS */
+  .section-head{display:flex; justify-content:space-between; align-items:center; gap:12px; margin:0 0 12px}
+  .section-head h3{margin:0;font-size:18px}
+  .section-head .muted{color:var(--muted);font-size:13px}
+  .cards-grid{
+    display:grid; grid-template-columns: repeat(4,minmax(240px,1fr)); gap:12px; margin-bottom:14px;
+  }
+  .kpi{
+    padding:16px; border-radius:18px;
+    background:linear-gradient(180deg, rgba(31,42,68,.95), rgba(18,27,45,.95));
+    border:1px solid var(--line)
+  }
+  .kpi .label{color:var(--muted); font-size:13px}
+  .kpi .value{margin-top:8px; font-size:28px; font-weight:800}
+  .kpi .sub{margin-top:6px; color:var(--muted); font-size:12px}
+  .analytics-grid{display:grid; grid-template-columns:1.4fr .9fr; gap:14px; align-items:start}
+  .analytics-box{
+    padding:16px; border-radius:18px;
+    background:linear-gradient(180deg, rgba(31,42,68,.95), rgba(18,27,45,.95));
+    border:1px solid var(--line)
+  }
+  .analytics-box h4{margin:0 0 12px}
+  .analytics-box .row{
+    display:flex; justify-content:space-between; gap:16px;
+    padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:14px
+  }
+  .analytics-box .row:last-child{border-bottom:none}
+  .analytics-box .muted{color:var(--muted)}
+
+  /* LISTS */
+  .drawer{
+    display:grid; grid-template-columns: repeat(4,1fr); gap:10px; margin-bottom:12px
+  }
+  .store-list,.supplier-list{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+  .list-item{
+    display:flex; justify-content:space-between; gap:10px; align-items:center;
+    padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06)
+  }
+
+  .footer-note{color:var(--muted); font-size:12px; margin-top:12px}
+
+  /* MODAL */
+  .modal{
+    position:fixed; inset:0; background:rgba(0,0,0,.65);
+    display:none; align-items:center; justify-content:center; padding:18px; z-index:50;
+  }
+  .modal.open{display:flex}
+  .modal-card{
+    width:min(920px,100%); max-height:92vh; overflow:auto;
+    background:linear-gradient(180deg, rgba(24,35,58,.98), rgba(17,26,45,.99));
+    border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow);
+    padding:18px;
+  }
+  .modal-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .modal-head h3{margin:0}
+  .modal-grid{
+    display:grid; grid-template-columns: repeat(3,1fr); gap:10px;
+  }
+  .modal-grid .field{margin:0}
+  .modal-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:14px}
+  .split{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px}
+  .order-card-meta{display:grid; gap:10px}
+  .meta-block{
+    padding:12px 14px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06)
+  }
+  .meta-block b{display:block; margin-bottom:4px}
+
+  @media (max-width:1200px){
+    .app{grid-template-columns:1fr}
+    .sidebar{position:relative; height:auto}
+    .orders-toolbar,.filters,.drawer,.modal-grid,.split,.cards-grid,.analytics-grid{grid-template-columns:1fr}
+    table{min-width:1100px}
+  }
+  @media (max-width:720px){
+    .main{padding:12px}
+    .title-box h2{font-size:22px}
+    .topbar{align-items:flex-start}
+    .toolbar-actions{width:100%}
+    .orders-toolbar,.filters{grid-template-columns:1fr}
+  }
 </style>
 </head>
-
 <body>
 
-<div class="container">
-<h1>CRM</h1>
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-badge">T</div>
+      <div>
+        <h1>TopDr CRM</h1>
+        <p>Темна CRM для замовлень, аналітики та обліку</p>
+      </div>
+    </div>
 
-<input id="search" placeholder="Пошук...">
-
-<br>
-
-<input id="product" placeholder="Товар">
-<input id="client" placeholder="Клієнт">
-<input id="phone" placeholder="Телефон">
-<input id="price" placeholder="Ціна">
-
-<button onclick="addOrder()">Додати</button>
-
-<table>
-<thead>
-<tr>
-<th>Товар</th>
-<th>Клієнт</th>
-<th>Телефон</th>
-<th>Ціна</th>
-<th>Статус</th>
-</tr>
-</thead>
-<tbody id="orders"></tbody>
-</table>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Email</label>
+      <input id="loginEmail" placeholder="you@example.com" autocomplete="username">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Пароль</label>
+      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="btnLogin">Увійти</button>
+      <button class="btn ghost" id="btnRegister">Реєстрація</button>
+    </div>
+    <div class="login-note">
+      Для синхронізації між ПК і телефоном дані зберігаються у Firebase Firestore. Потрібно увімкнути Email/Password у Firebase Authentication.
+    </div>
+    <div class="footer-note">
+      Після входу дані будуть однакові на всіх пристроях з цим акаунтом.
+    </div>
+  </div>
 </div>
 
-<div class="modal" id="modal">
-<div class="modal-content">
-<h3>Замовлення</h3>
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge">T</div>
+      <div>
+        <h1>TopDr CRM</h1>
+        <p id="greeting">Вітаю!</p>
+      </div>
+    </div>
+    <div class="nav">
+      <button data-tab="orders" class="active">Замовлення <span class="hint">список</span></button>
+      <button data-tab="analytics">Аналітика <span class="hint">прибуток / реклама</span></button>
+      <button data-tab="stores">Магазини <span class="hint">список</span></button>
+      <button data-tab="suppliers">Постачальники <span class="hint">список</span></button>
+      <button data-tab="settings">Налаштування <span class="hint">логін / резерв</span></button>
+    </div>
+    <div style="margin-top:18px;">
+      <button class="btn danger" id="logoutBtn" style="width:100%;">Вийти</button>
+    </div>
+  </aside>
 
-<input id="m_product">
-<input id="m_client">
-<input id="m_phone">
-<input id="m_price">
-<input id="m_ttn" placeholder="ТТН">
+  <main class="main">
+    <div class="topbar">
+      <div class="title-box">
+        <h2 id="pageTitle">Замовлення</h2>
+        <p id="pageSubtitle">Список замовлень як у сучасній CRM. Верхній блок є тільки тут.</p>
+      </div>
+      <div class="toolbar-actions" id="topActions">
+        <button class="btn ghost" id="exportExcelTop">Резервна копія Excel</button>
+        <button class="btn ghost" id="exportJsonTop">Резервна копія JSON</button>
+        <button class="btn success" id="openAddOrder">+ Додати замовлення</button>
+      </div>
+    </div>
 
-<select id="m_status">
-<option>Новий</option>
-<option>В роботі</option>
-<option>Відправлено</option>
-<option>Завершено</option>
-</select>
+    <!-- ORDERS -->
+    <section id="ordersSection" class="section active">
+      <div class="panel">
+        <div id="orderFormArea" class="orders-toolbar">
+          <div class="field"><input id="fProduct" placeholder="Назва товару"></div>
+          <div class="field"><input id="fStore" list="storesDatalist" placeholder="Назва магазину"></div>
+          <div class="field"><input id="fClient" placeholder="Клієнт"></div>
+          <div class="field"><input id="fPhone" placeholder="Телефон"></div>
+          <div class="field"><input id="fPrice" type="number" step="0.01" placeholder="Ціна, грн"></div>
+          <div class="field"><input id="fCost" type="number" step="0.01" placeholder="Закупка, грн"></div>
+          <div class="field"><input id="fAds" type="number" step="0.01" placeholder="Реклама, грн"></div>
+          <div class="field"><input id="fSupplier" list="suppliersDatalist" placeholder="Постачальник"></div>
+          <div class="field"><select id="fStatus">
+            <option value="new">Новий</option>
+            <option value="work">В роботі</option>
+            <option value="sent">Відправлено</option>
+            <option value="done">Завершено</option>
+            <option value="cancel">Скасовано</option>
+          </select></div>
+          <div class="field"><select id="fPaid"><option value="no">Не оплачено</option><option value="yes">Оплачено</option></select></div>
+          <div class="field"><input id="fTtn" placeholder="ТТН"></div>
+          <div class="field"><select id="fTtnStatus">
+            <option value="none">ТТН не створено</option>
+            <option value="new">ТТН створено</option>
+            <option value="way">В дорозі</option>
+            <option value="received">Отримано</option>
+          </select></div>
+          <div class="field"><input id="fDate" type="date"></div>
+          <div class="field"><input id="fNotes" placeholder="Коментар"></div>
+          <div class="toolbar-actions" style="grid-column:1 / -1;">
+            <button class="btn ghost" id="resetOrderForm" type="button">Скинути</button>
+            <button class="btn success" id="addOrderBtn" type="button">Додати замовлення</button>
+          </div>
+        </div>
 
-<br><br>
+        <div style="padding:0 14px 14px;">
+          <div class="section-head">
+            <div>
+              <h3>Список замовлень</h3>
+              <div class="muted">Клік по рядку відкриває картку замовлення. Статуси можна міняти кнопками прямо в таблиці.</div>
+            </div>
+          </div>
+          <div class="filters">
+            <div class="field"><input id="searchOrder" placeholder="Пошук товару / клієнта / телефону"></div>
+            <div class="field"><select id="filterStore"><option value="all">Всі магазини</option></select></div>
+            <div class="field"><select id="filterSupplier"><option value="all">Всі постачальники</option></select></div>
+            <div class="field"><select id="filterStatus"><option value="all">Всі статуси</option></select></div>
+            <div class="field"><input id="filterFrom" type="date"></div>
+            <div class="field"><input id="filterTo" type="date"></div>
+          </div>
+        </div>
 
-<button onclick="saveOrder()">Зберегти</button>
-<button onclick="markDone()">Отримано</button>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Магазин</th>
+                <th>Клієнт</th>
+                <th>Телефон</th>
+                <th>Постачальник</th>
+                <th>Ціна</th>
+                <th>Закупка</th>
+                <th>Реклама</th>
+                <th>Прибуток</th>
+                <th>Статус</th>
+                <th>Оплата</th>
+                <th>ТТН</th>
+                <th>Дії</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="analyticsSection" class="section">
+      <div class="section-head">
+        <div>
+          <h3>Аналітика</h3>
+          <div class="muted">Фільтри по магазину / постачальнику / статусу / періоду. Підрахунки — у копійках без втрат.</div>
+        </div>
+      </div>
+
+      <div class="panel" style="padding:14px; margin-bottom:14px;">
+        <div class="filters" style="padding:0; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;">
+          <div class="field"><select id="anStore"><option value="all">Всі магазини</option></select></div>
+          <div class="field"><select id="anSupplier"><option value="all">Всі постачальники</option></select></div>
+          <div class="field"><select id="anStatus"><option value="all">Всі статуси</option></select></div>
+          <div class="field"><input id="anFrom" type="date"></div>
+          <div class="field"><input id="anTo" type="date"></div>
+          <div class="toolbar-actions" style="align-self:end;"><button class="btn ghost" id="anReset">Скинути фільтри</button></div>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="kpi"><div class="label">Оборот</div><div class="value" id="kpiTurnover">₴0.00</div><div class="sub">Сума всіх замовлень</div></div>
+        <div class="kpi"><div class="label">Прибуток</div><div class="value" id="kpiProfit">₴0.00</div><div class="sub">Після закупки та реклами</div></div>
+        <div class="kpi"><div class="label">Реклама</div><div class="value" id="kpiAds">₴0.00</div><div class="sub">Усі рекламні витрати</div></div>
+        <div class="kpi"><div class="label">Замовлення</div><div class="value" id="kpiCount">0</div><div class="sub">Кількість по фільтру</div></div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytics-box">
+          <h4>Підсумок</h4>
+          <div class="row"><span class="muted">Оборот</span><b id="sumTurnover">₴0.00</b></div>
+          <div class="row"><span class="muted">Закупка</span><b id="sumCost">₴0.00</b></div>
+          <div class="row"><span class="muted">Реклама</span><b id="sumAds">₴0.00</b></div>
+          <div class="row"><span class="muted">Прибуток</span><b id="sumProfit">₴0.00</b></div>
+          <div class="row"><span class="muted">Оплачені</span><b id="sumPaid">0</b></div>
+          <div class="row"><span class="muted">Неоплачені</span><b id="sumUnpaid">0</b></div>
+        </div>
+        <div class="analytics-box">
+          <h4>Коротка статистика</h4>
+          <div class="row"><span class="muted">Середній чек</span><b id="avgCheck">₴0.00</b></div>
+          <div class="row"><span class="muted">Середній прибуток</span><b id="avgProfit">₴0.00</b></div>
+          <div class="row"><span class="muted">Маржинальність</span><b id="marginPct">0%</b></div>
+          <div class="row"><span class="muted">Кількість магазинів</span><b id="storeCount">0</b></div>
+          <div class="row"><span class="muted">Кількість постачальників</span><b id="supplierCount">0</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORES -->
+    <section id="storesSection" class="section">
+      <div class="section-head">
+        <div>
+          <h3>Магазини</h3>
+          <div class="muted">Список магазинів, який використовується у замовленнях та фільтрах.</div>
+        </div>
+      </div>
+      <div class="panel" style="padding:14px;">
+        <div class="drawer">
+          <div class="field"><input id="newStoreName" placeholder="Назва магазину"></div>
+          <div class="field"><input id="newStoreNote" placeholder="Примітка"></div>
+          <div class="field"><input id="newStoreTag" placeholder="Тег / код"></div>
+          <div class="toolbar-actions" style="align-self:end;"><button class="btn success" id="addStoreBtn">Додати магазин</button></div>
+        </div>
+        <div id="storesList" class="store-list"></div>
+      </div>
+    </section>
+
+    <!-- SUPPLIERS -->
+    <section id="suppliersSection" class="section">
+      <div class="section-head">
+        <div>
+          <h3>Постачальники</h3>
+          <div class="muted">Список постачальників, який використовується у замовленнях та фільтрах.</div>
+        </div>
+      </div>
+      <div class="panel" style="padding:14px;">
+        <div class="drawer">
+          <div class="field"><input id="newSupplierName" placeholder="Назва постачальника"></div>
+          <div class="field"><input id="newSupplierNote" placeholder="Коментар"></div>
+          <div class="field"><input id="newSupplierTag" placeholder="Тег / код"></div>
+          <div class="toolbar-actions" style="align-self:end;"><button class="btn success" id="addSupplierBtn">Додати постачальника</button></div>
+        </div>
+        <div id="suppliersList" class="supplier-list"></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settingsSection" class="section">
+      <div class="section-head">
+        <div>
+          <h3>Налаштування</h3>
+          <div class="muted">Зміна логіну, пароля, резервна копія та експорт.</div>
+        </div>
+      </div>
+      <div class="panel" style="padding:14px;">
+        <div class="drawer" style="grid-template-columns: repeat(3,1fr);">
+          <div class="field"><input id="setEmail" placeholder="Новий email"></div>
+          <div class="field"><input id="setPass" type="password" placeholder="Новий пароль"></div>
+          <div class="toolbar-actions" style="align-self:end;"><button class="btn success" id="saveCredsBtn">Зберегти логін / пароль</button></div>
+        </div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn ghost" id="exportJsonBtn">Експорт JSON</button>
+          <button class="btn ghost" id="exportExcelBtn">Резервна копія Excel</button>
+          <button class="btn danger" id="clearAllBtn">Очистити всі дані</button>
+        </div>
+        <div class="footer-note">
+          Дані зберігаються у Firestore — тому відкриваються і синхронізуються на будь-якому пристрої після входу в акаунт.
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
+
+<div class="modal" id="orderModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Картка замовлення</h3>
+        <div class="small">Клік по рядку відкриває картку для редагування, ТТН та статусів.</div>
+      </div>
+      <button class="btn ghost" id="closeModal">✕</button>
+    </div>
+
+    <div class="split">
+      <div class="panel" style="padding:14px;">
+        <div class="modal-grid">
+          <div class="field"><label>Товар</label><input id="mProduct"></div>
+          <div class="field"><label>Магазин</label><input id="mStore" list="storesDatalist"></div>
+          <div class="field"><label>Постачальник</label><input id="mSupplier" list="suppliersDatalist"></div>
+          <div class="field"><label>Клієнт</label><input id="mClient"></div>
+          <div class="field"><label>Телефон</label><input id="mPhone"></div>
+          <div class="field"><label>Дата</label><input id="mDate" type="date"></div>
+          <div class="field"><label>Ціна, грн</label><input id="mPrice" type="number" step="0.01"></div>
+          <div class="field"><label>Закупка, грн</label><input id="mCost" type="number" step="0.01"></div>
+          <div class="field"><label>Реклама, грн</label><input id="mAds" type="number" step="0.01"></div>
+          <div class="field"><label>Статус замовлення</label>
+            <select id="mStatus">
+              <option value="new">Новий</option>
+              <option value="work">В роботі</option>
+              <option value="sent">Відправлено</option>
+              <option value="done">Завершено</option>
+              <option value="cancel">Скасовано</option>
+            </select>
+          </div>
+          <div class="field"><label>Оплата</label>
+            <select id="mPaid">
+              <option value="no">Не оплачено</option>
+              <option value="yes">Оплачено</option>
+            </select>
+          </div>
+          <div class="field"><label>Коментар</label><input id="mNotes"></div>
+          <div class="field"><label>ТТН</label><input id="mTtn" placeholder="Номер ТТН"></div>
+          <div class="field"><label>Статус ТТН</label>
+            <select id="mTtnStatus">
+              <option value="none">ТТН не створено</option>
+              <option value="new">ТТН створено</option>
+              <option value="way">В дорозі</option>
+              <option value="received">Отримано</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn ghost" id="btnMarkReceived">Позначити отриманим</button>
+          <button class="btn ghost" id="btnDuplicate">Дублювати</button>
+          <button class="btn danger" id="btnDelete">Видалити</button>
+          <button class="btn primary" id="btnSaveOrder">Зберегти</button>
+        </div>
+      </div>
+
+      <div class="panel" style="padding:14px;">
+        <div class="order-card-meta">
+          <div class="meta-block">
+            <b>Сума</b>
+            <div id="metaSum">₴0.00</div>
+          </div>
+          <div class="meta-block">
+            <b>Прибуток</b>
+            <div id="metaProfit">₴0.00</div>
+          </div>
+          <div class="meta-block">
+            <b>ТТН</b>
+            <div id="metaTtn">—</div>
+          </div>
+          <div class="meta-block">
+            <b>Статус ТТН</b>
+            <div id="metaTtnStatus">—</div>
+          </div>
+          <div class="meta-block">
+            <b>Порада</b>
+            <div class="small">Якщо у ТТН статус “Отримано”, замовлення автоматично стане “Завершено”. Без API НП це керується вручну, але синхронно на всіх пристроях.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<datalist id="storesDatalist"></datalist>
+<datalist id="suppliersDatalist"></datalist>
+<input id="importJsonFile" type="file" accept="application/json" class="hidden">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAxbOlBZcd49xyhcSfOjjqWcUdwKAddwO0",
   authDomain: "topdr-crm.firebaseapp.com",
-  projectId: "topdr-crm"
+  projectId: "topdr-crm",
+  storageBucket: "topdr-crm.firebasestorage.app",
+  messagingSenderId: "325192431795",
+  appId: "1:325192431795:web:191d35f730a243b36598c6"
 };
 
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.firestore();
+const FieldValue = firebase.firestore.FieldValue;
 
-let orders = [];
-let currentId = null;
+const appState = {
+  user: null,
+  orders: [],
+  stores: [],
+  suppliers: [],
+  currentOrderId: null,
+  filters: { search:'', store:'all', supplier:'all', status:'all', from:'', to:'' },
+  anFilters: { store:'all', supplier:'all', status:'all', from:'', to:'' },
+  unsubscribers: []
+};
 
-db.collection("orders").onSnapshot(snapshot=>{
-  orders = [];
-  snapshot.forEach(doc=>{
-    orders.push({id:doc.id, ...doc.data()});
+const STATUS_LABELS = { new:'Новий', work:'В роботі', sent:'Відправлено', done:'Завершено', cancel:'Скасовано' };
+const STATUS_CLASS = { new:'info', work:'warn', sent:'info', done:'ok', cancel:'bad' };
+const TTN_LABELS = { none:'ТТН не створено', new:'ТТН створено', way:'В дорозі', received:'Отримано' };
+const TTN_CLASS = { none:'ttn-none', new:'ttn-new', way:'ttn-way', received:'ttn-received' };
+
+const el = (id) => document.getElementById(id);
+const qs = (s) => document.querySelector(s);
+const money = (kop) => new Intl.NumberFormat('uk-UA', { style:'currency', currency:'UAH', minimumFractionDigits:2, maximumFractionDigits:2 }).format((kop||0)/100);
+const toKop = (v) => {
+  const n = Number(String(v ?? '').replace(',', '.'));
+  return Number.isFinite(n) ? Math.round(n * 100) : 0;
+};
+const uid = () => Math.random().toString(36).slice(2, 11);
+const safe = (s) => String(s ?? '').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[m]));
+
+function showLogin(){ el('loginScreen').classList.remove('hidden'); el('app').classList.add('hidden'); }
+function showApp(){ el('loginScreen').classList.add('hidden'); el('app').classList.remove('hidden'); }
+
+function setTab(tab){
+  document.querySelectorAll('.nav button[data-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+  document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+  el(tab + 'Section').classList.add('active');
+
+  const titles = {
+    orders: ['Замовлення', 'Саме цей блок зроблено максимально близько до SalesDrive. Верхній блок тільки тут.'],
+    analytics: ['Аналітика', 'Усі підрахунки точні до копійки. Фільтри по магазинах, постачальниках і періоду.'],
+    stores: ['Магазини', 'Список магазинів зберігається у Firebase і підтягується на всіх пристроях.'],
+    suppliers: ['Постачальники', 'Список постачальників зберігається у Firebase і підтягується на всіх пристроях.'],
+    settings: ['Налаштування', 'Логін / пароль, резервні копії та експорт даних.']
+  };
+  el('pageTitle').textContent = titles[tab][0];
+  el('pageSubtitle').textContent = titles[tab][1];
+  el('topActions').classList.toggle('hidden', tab !== 'orders');
+  el('orderFormArea').classList.toggle('hidden', tab !== 'orders');
+}
+
+function calcProfitKop(order){ return (order.priceKop||0) - (order.costKop||0) - (order.adsKop||0); }
+
+function visibleOrders(base = appState.orders, filters = appState.filters){
+  const q = (filters.search || '').trim().toLowerCase();
+  return base.filter(o => {
+    const d = (o.date || '').slice(0,10);
+    const okFrom = !filters.from || d >= filters.from;
+    const okTo = !filters.to || d <= filters.to;
+    const okStore = filters.store === 'all' || o.store === filters.store;
+    const okSupplier = filters.supplier === 'all' || o.supplier === filters.supplier;
+    const okStatus = filters.status === 'all' || o.status === filters.status;
+    const okQ = !q || [o.product, o.client, o.phone, o.store, o.supplier, o.notes, o.ttn].join(' ').toLowerCase().includes(q);
+    return okFrom && okTo && okStore && okSupplier && okStatus && okQ;
   });
-  renderOrders();
-});
+}
 
-function addOrder(){
-  db.collection("orders").add({
-    product: product.value,
-    client: client.value,
-    phone: phone.value,
-    price: +price.value,
-    status:"Новий",
-    ttn:""
+function analyticsOrders(){
+  const filters = appState.anFilters;
+  return appState.orders.filter(o => {
+    const d = (o.date || '').slice(0,10);
+    const okFrom = !filters.from || d >= filters.from;
+    const okTo = !filters.to || d <= filters.to;
+    const okStore = filters.store === 'all' || o.store === filters.store;
+    const okSupplier = filters.supplier === 'all' || o.supplier === filters.supplier;
+    const okStatus = filters.status === 'all' || o.status === filters.status;
+    return okFrom && okTo && okStore && okSupplier && okStatus;
   });
+}
+
+function renderSelectOptions(){
+  const storesOpts = appState.stores.map(s => `<option value="${safe(s.name)}"></option>`).join('');
+  const suppliersOpts = appState.suppliers.map(s => `<option value="${safe(s.name)}"></option>`).join('');
+  el('storesDatalist').innerHTML = storesOpts;
+  el('suppliersDatalist').innerHTML = suppliersOpts;
+
+  const optStoreAll = '<option value="all">Всі магазини</option>';
+  const optSupAll = '<option value="all">Всі постачальники</option>';
+  const statusOpts = '<option value="all">Всі статуси</option>' + Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  el('filterStore').innerHTML = optStoreAll + appState.stores.map(s => `<option value="${safe(s.name)}">${safe(s.name)}</option>`).join('');
+  el('filterSupplier').innerHTML = optSupAll + appState.suppliers.map(s => `<option value="${safe(s.name)}">${safe(s.name)}</option>`).join('');
+  el('filterStatus').innerHTML = statusOpts;
+  el('anStore').innerHTML = optStoreAll + appState.stores.map(s => `<option value="${safe(s.name)}">${safe(s.name)}</option>`).join('');
+  el('anSupplier').innerHTML = optSupAll + appState.suppliers.map(s => `<option value="${safe(s.name)}">${safe(s.name)}</option>`).join('');
+  el('anStatus').innerHTML = statusOpts;
 }
 
 function renderOrders(){
-  const q = search.value.toLowerCase();
-  const table = document.getElementById("orders");
-  table.innerHTML="";
-
-  orders
-  .filter(o => 
-    o.product.toLowerCase().includes(q) ||
-    o.client.toLowerCase().includes(q) ||
-    o.phone.includes(q)
-  )
-  .forEach(o=>{
-    table.innerHTML += `
-      <tr onclick="openModal('${o.id}')">
-        <td>${o.product}</td>
-        <td>${o.client}</td>
-        <td>${o.phone}</td>
-        <td>${o.price}</td>
-        <td>${o.status}</td>
+  renderSelectOptions();
+  const rows = visibleOrders(appState.orders).slice().sort((a,b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+  const tbody = el('ordersBody');
+  tbody.innerHTML = rows.map(o => {
+    const profit = calcProfitKop(o);
+    const ttnLabel = TTN_LABELS[o.ttnStatus || 'none'];
+    const ttnClass = TTN_CLASS[o.ttnStatus || 'none'];
+    return `
+      <tr data-id="${o.id}">
+        <td>${safe(o.date || '')}</td>
+        <td><b>${safe(o.product || '')}</b><div class="small">${safe(o.notes || '')}</div></td>
+        <td>${safe(o.store || '')}</td>
+        <td>${safe(o.client || '')}</td>
+        <td>${safe(o.phone || '')}</td>
+        <td>${safe(o.supplier || '')}</td>
+        <td>${money(o.priceKop)}</td>
+        <td>${money(o.costKop)}</td>
+        <td>${money(o.adsKop)}</td>
+        <td><b>${money(profit)}</b></td>
+        <td>
+          <div class="status-bar">
+            ${Object.entries(STATUS_LABELS).map(([k,v]) => `<button class="status-btn ${o.status===k?'active '+k:''}" data-action="set-status" data-status="${k}" data-id="${o.id}">${v}</button>`).join('')}
+          </div>
+        </td>
+        <td>
+          <span class="pill ${o.paid==='yes' ? 'ok' : 'warn'}">${o.paid==='yes' ? 'Оплачено' : 'Не оплачено'}</span>
+        </td>
+        <td>
+          <span class="ttn-chip ${ttnClass}">${safe(o.ttn || '—')} · ${safe(ttnLabel)}</span>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="btn ghost" data-action="edit" data-id="${o.id}">Редагувати</button>
+            <button class="btn ghost" data-action="copyttn" data-id="${o.id}">Копіювати ТТН</button>
+            <button class="btn danger" data-action="delete" data-id="${o.id}">Видалити</button>
+          </div>
+        </td>
       </tr>
     `;
+  }).join('');
+
+  updateAnalytics();
+}
+
+function updateAnalytics(){
+  const rows = analyticsOrders();
+  const sum = rows.reduce((acc,o) => {
+    acc.turnover += o.priceKop || 0;
+    acc.cost += o.costKop || 0;
+    acc.ads += o.adsKop || 0;
+    acc.profit += calcProfitKop(o);
+    acc.paid += o.paid === 'yes' ? 1 : 0;
+    acc.unpaid += o.paid !== 'yes' ? 1 : 0;
+    acc.count += 1;
+    return acc;
+  }, { turnover:0, cost:0, ads:0, profit:0, paid:0, unpaid:0, count:0 });
+
+  el('kpiTurnover').textContent = money(sum.turnover);
+  el('kpiProfit').textContent = money(sum.profit);
+  el('kpiAds').textContent = money(sum.ads);
+  el('kpiCount').textContent = sum.count;
+
+  el('sumTurnover').textContent = money(sum.turnover);
+  el('sumCost').textContent = money(sum.cost);
+  el('sumAds').textContent = money(sum.ads);
+  el('sumProfit').textContent = money(sum.profit);
+  el('sumPaid').textContent = sum.paid;
+  el('sumUnpaid').textContent = sum.unpaid;
+  el('avgCheck').textContent = sum.count ? money(Math.round(sum.turnover / sum.count)) : money(0);
+  el('avgProfit').textContent = sum.count ? money(Math.round(sum.profit / sum.count)) : money(0);
+  el('marginPct').textContent = sum.turnover ? `${((sum.profit / sum.turnover) * 100).toFixed(1)}%` : '0%';
+  el('storeCount').textContent = appState.stores.length;
+  el('supplierCount').textContent = appState.suppliers.length;
+}
+
+function renderLists(){
+  el('storesList').innerHTML = appState.stores.map(s => `
+    <div class="list-item">
+      <div><b>${safe(s.name)}</b><div class="small">${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</div></div>
+      <button class="btn danger" data-remove-store="${s.id}">Видалити</button>
+    </div>
+  `).join('') || '<div class="small">Поки немає магазинів.</div>';
+
+  el('suppliersList').innerHTML = appState.suppliers.map(s => `
+    <div class="list-item">
+      <div><b>${safe(s.name)}</b><div class="small">${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</div></div>
+      <button class="btn danger" data-remove-supplier="${s.id}">Видалити</button>
+    </div>
+  `).join('') || '<div class="small">Поки немає постачальників.</div>';
+}
+
+function renderAll(){
+  renderOrders();
+  renderLists();
+}
+
+function resetOrderForm(){
+  el('fProduct').value = '';
+  el('fStore').value = '';
+  el('fClient').value = '';
+  el('fPhone').value = '';
+  el('fPrice').value = '';
+  el('fCost').value = '';
+  el('fAds').value = '';
+  el('fSupplier').value = '';
+  el('fStatus').value = 'new';
+  el('fPaid').value = 'no';
+  el('fTtn').value = '';
+  el('fTtnStatus').value = 'none';
+  el('fDate').value = new Date().toISOString().slice(0,10);
+  el('fNotes').value = '';
+}
+
+function orderFormData(){
+  const ttnStatus = el('fTtnStatus').value;
+  return {
+    product: el('fProduct').value.trim(),
+    store: el('fStore').value.trim(),
+    client: el('fClient').value.trim(),
+    phone: el('fPhone').value.trim(),
+    supplier: el('fSupplier').value.trim(),
+    priceKop: toKop(el('fPrice').value),
+    costKop: toKop(el('fCost').value),
+    adsKop: toKop(el('fAds').value),
+    status: ttnStatus === 'received' ? 'done' : el('fStatus').value,
+    paid: el('fPaid').value,
+    ttn: el('fTtn').value.trim(),
+    ttnStatus,
+    date: el('fDate').value || new Date().toISOString().slice(0,10),
+    notes: el('fNotes').value.trim()
+  };
+}
+
+async function addOrder(){
+  const data = orderFormData();
+  if(!data.product) return alert('Вкажи назву товару');
+  const ref = await db.collection('orders').add({
+    ...data,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp()
+  });
+  // If ttn status received, ensure done
+  if (data.ttnStatus === 'received') {
+    await ref.update({ status:'done', updatedAt: FieldValue.serverTimestamp() });
+  }
+  resetOrderForm();
+}
+
+function openOrderModal(id){
+  appState.currentOrderId = id;
+  const o = appState.orders.find(x => x.id === id);
+  if(!o) return;
+
+  el('mProduct').value = o.product || '';
+  el('mStore').value = o.store || '';
+  el('mSupplier').value = o.supplier || '';
+  el('mClient').value = o.client || '';
+  el('mPhone').value = o.phone || '';
+  el('mDate').value = (o.date || new Date().toISOString().slice(0,10)).slice(0,10);
+  el('mPrice').value = (o.priceKop || 0) / 100;
+  el('mCost').value = (o.costKop || 0) / 100;
+  el('mAds').value = (o.adsKop || 0) / 100;
+  el('mStatus').value = o.status || 'new';
+  el('mPaid').value = o.paid || 'no';
+  el('mNotes').value = o.notes || '';
+  el('mTtn').value = o.ttn || '';
+  el('mTtnStatus').value = o.ttnStatus || 'none';
+
+  const profit = calcProfitKop(o);
+  el('metaSum').textContent = money(o.priceKop || 0);
+  el('metaProfit').textContent = money(profit);
+  el('metaTtn').textContent = o.ttn || '—';
+  el('metaTtnStatus').textContent = TTN_LABELS[o.ttnStatus || 'none'];
+
+  el('orderModal').classList.add('open');
+}
+
+function closeModal(){ el('orderModal').classList.remove('open'); }
+
+async function saveOrder(){
+  const id = appState.currentOrderId;
+  if(!id) return;
+  const o = appState.orders.find(x => x.id === id);
+  if(!o) return;
+
+  const ttnStatus = el('mTtnStatus').value;
+  const payload = {
+    product: el('mProduct').value.trim(),
+    store: el('mStore').value.trim(),
+    supplier: el('mSupplier').value.trim(),
+    client: el('mClient').value.trim(),
+    phone: el('mPhone').value.trim(),
+    date: el('mDate').value || new Date().toISOString().slice(0,10),
+    priceKop: toKop(el('mPrice').value),
+    costKop: toKop(el('mCost').value),
+    adsKop: toKop(el('mAds').value),
+    status: ttnStatus === 'received' ? 'done' : el('mStatus').value,
+    paid: el('mPaid').value,
+    notes: el('mNotes').value.trim(),
+    ttn: el('mTtn').value.trim(),
+    ttnStatus,
+    updatedAt: FieldValue.serverTimestamp()
+  };
+  await db.collection('orders').doc(id).update(payload);
+  if (ttnStatus === 'received') {
+    await db.collection('orders').doc(id).update({ status:'done', updatedAt: FieldValue.serverTimestamp() });
+  }
+  closeModal();
+}
+
+async function markReceived(){
+  const id = appState.currentOrderId;
+  if(!id) return;
+  await db.collection('orders').doc(id).update({
+    ttnStatus:'received',
+    status:'done',
+    updatedAt: FieldValue.serverTimestamp()
+  });
+  closeModal();
+}
+
+async function duplicateOrder(){
+  const id = appState.currentOrderId;
+  const o = appState.orders.find(x => x.id === id);
+  if(!o) return;
+  await db.collection('orders').add({
+    product: o.product || '',
+    store: o.store || '',
+    supplier: o.supplier || '',
+    client: o.client || '',
+    phone: o.phone || '',
+    date: new Date().toISOString().slice(0,10),
+    priceKop: o.priceKop || 0,
+    costKop: o.costKop || 0,
+    adsKop: o.adsKop || 0,
+    status: 'new',
+    paid: 'no',
+    notes: o.notes || '',
+    ttn: '',
+    ttnStatus: 'none',
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp()
   });
 }
 
-function openModal(id){
-  currentId = id;
-  const o = orders.find(x=>x.id==id);
-
-  m_product.value = o.product;
-  m_client.value = o.client;
-  m_phone.value = o.phone;
-  m_price.value = o.price;
-  m_status.value = o.status;
-  m_ttn.value = o.ttn || "";
-
-  modal.style.display="flex";
+async function deleteOrder(){
+  const id = appState.currentOrderId;
+  if(!id) return;
+  if(!confirm('Видалити замовлення?')) return;
+  await db.collection('orders').doc(id).delete();
+  closeModal();
 }
 
-function saveOrder(){
-  db.collection("orders").doc(currentId).update({
-    product:m_product.value,
-    client:m_client.value,
-    phone:m_phone.value,
-    price:+m_price.value,
-    status:m_status.value,
-    ttn:m_ttn.value
+async function setOrderStatus(id, status){
+  await db.collection('orders').doc(id).update({
+    status,
+    updatedAt: FieldValue.serverTimestamp()
+  });
+}
+
+async function togglePaid(id){
+  const o = appState.orders.find(x => x.id === id);
+  if(!o) return;
+  await db.collection('orders').doc(id).update({
+    paid: o.paid === 'yes' ? 'no' : 'yes',
+    updatedAt: FieldValue.serverTimestamp()
+  });
+}
+
+async function copyTtn(id){
+  const o = appState.orders.find(x => x.id === id);
+  if(!o || !o.ttn) return;
+  await navigator.clipboard.writeText(o.ttn);
+  alert('ТТН скопійовано');
+}
+
+async function addStore(){
+  const name = el('newStoreName').value.trim();
+  if(!name) return alert('Вкажи назву магазину');
+  await db.collection('stores').add({
+    name,
+    note: el('newStoreNote').value.trim(),
+    tag: el('newStoreTag').value.trim(),
+    createdAt: FieldValue.serverTimestamp()
+  });
+  el('newStoreName').value = el('newStoreNote').value = el('newStoreTag').value = '';
+}
+
+async function addSupplier(){
+  const name = el('newSupplierName').value.trim();
+  if(!name) return alert('Вкажи назву постачальника');
+  await db.collection('suppliers').add({
+    name,
+    note: el('newSupplierNote').value.trim(),
+    tag: el('newSupplierTag').value.trim(),
+    createdAt: FieldValue.serverTimestamp()
+  });
+  el('newSupplierName').value = el('newSupplierNote').value = el('newSupplierTag').value = '';
+}
+
+async function saveCreds(){
+  const email = el('setEmail').value.trim();
+  const pass = el('setPass').value.trim();
+  if(!email || !pass) return alert('Вкажи email і пароль');
+  if(!auth.currentUser) return alert('Спочатку увійди в акаунт');
+  await auth.currentUser.updatePassword(pass);
+  alert('Пароль оновлено');
+}
+
+function exportJSON(){
+  const payload = {
+    orders: appState.orders,
+    stores: appState.stores,
+    suppliers: appState.suppliers,
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `TopDr_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 800);
+}
+
+function exportExcel(){
+  const rows = appState.orders.map(o => ({
+    Дата: o.date || '',
+    Товар: o.product || '',
+    Магазин: o.store || '',
+    Клієнт: o.client || '',
+    Телефон: o.phone || '',
+    Постачальник: o.supplier || '',
+    Ціна_грн: (o.priceKop || 0) / 100,
+    Закупка_грн: (o.costKop || 0) / 100,
+    Реклама_грн: (o.adsKop || 0) / 100,
+    Прибуток_грн: calcProfitKop(o) / 100,
+    Статус: STATUS_LABELS[o.status] || o.status,
+    Оплата: o.paid === 'yes' ? 'Оплачено' : 'Не оплачено',
+    ТТН: o.ttn || '',
+    ТТН_статус: TTN_LABELS[o.ttnStatus || 'none'],
+    Коментар: o.notes || ''
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+  XLSX.writeFile(wb, `TopDr_backup_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function bindCommonUI(){
+  document.querySelectorAll('.nav button[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => setTab(btn.dataset.tab));
   });
 
-  modal.style.display="none";
-}
-
-function markDone(){
-  db.collection("orders").doc(currentId).update({
-    status:"Завершено"
+  el('openAddOrder').addEventListener('click', () => { setTab('orders'); el('fProduct').focus(); });
+  el('addOrderBtn').addEventListener('click', addOrder);
+  el('resetOrderForm').addEventListener('click', resetOrderForm);
+  el('exportExcelTop').addEventListener('click', exportExcel);
+  el('exportJsonTop').addEventListener('click', exportJSON);
+  el('exportExcelBtn').addEventListener('click', exportExcel);
+  el('exportJsonBtn').addEventListener('click', exportJSON);
+  el('clearAllBtn').addEventListener('click', async () => {
+    if(!confirm('Точно очистити всі дані?')) return;
+    const batch = db.batch();
+    const collections = ['orders','stores','suppliers'];
+    for (const c of collections) {
+      const snap = await db.collection(c).get();
+      snap.forEach(doc => batch.delete(doc.ref));
+    }
+    await batch.commit();
   });
-  modal.style.display="none";
+
+  el('addStoreBtn').addEventListener('click', addStore);
+  el('addSupplierBtn').addEventListener('click', addSupplier);
+
+  el('btnMarkReceived').addEventListener('click', markReceived);
+  el('btnDelete').addEventListener('click', deleteOrder);
+  el('btnSaveOrder').addEventListener('click', saveOrder);
+  el('btnDuplicate').addEventListener('click', duplicateOrder);
+  el('closeModal').addEventListener('click', closeModal);
+  el('orderModal').addEventListener('click', (e) => { if(e.target.id === 'orderModal') closeModal(); });
+
+  el('searchOrder').addEventListener('input', () => { appState.filters.search = el('searchOrder').value; renderOrders(); });
+  ['filterStore','filterSupplier','filterStatus','filterFrom','filterTo'].forEach(id => {
+    el(id).addEventListener('change', () => {
+      appState.filters.store = el('filterStore').value;
+      appState.filters.supplier = el('filterSupplier').value;
+      appState.filters.status = el('filterStatus').value;
+      appState.filters.from = el('filterFrom').value;
+      appState.filters.to = el('filterTo').value;
+      renderOrders();
+    });
+  });
+  ['anStore','anSupplier','anStatus','anFrom','anTo'].forEach(id => {
+    el(id).addEventListener('change', () => {
+      appState.anFilters.store = el('anStore').value;
+      appState.anFilters.supplier = el('anSupplier').value;
+      appState.anFilters.status = el('anStatus').value;
+      appState.anFilters.from = el('anFrom').value;
+      appState.anFilters.to = el('anTo').value;
+      updateAnalytics();
+    });
+  });
+  el('anReset').addEventListener('click', () => {
+    el('anStore').value = 'all'; el('anSupplier').value = 'all'; el('anStatus').value = 'all';
+    el('anFrom').value = ''; el('anTo').value = '';
+    appState.anFilters = { store:'all', supplier:'all', status:'all', from:'', to:'' };
+    updateAnalytics();
+  });
+
+  el('logoutBtn').addEventListener('click', () => auth.signOut());
+  el('btnLogin').addEventListener('click', () => signIn(false));
+  el('btnRegister').addEventListener('click', () => signIn(true));
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
 }
 
-search.oninput = renderOrders;
-
-window.onclick = (e)=>{
-  if(e.target.id==="modal"){
-    modal.style.display="none";
+async function signIn(register = false){
+  const email = el('loginEmail').value.trim();
+  const pass = el('loginPass').value.trim();
+  if(!email || !pass) return alert('Вкажи email і пароль');
+  try{
+    if(register){
+      await auth.createUserWithEmailAndPassword(email, pass);
+    }else{
+      await auth.signInWithEmailAndPassword(email, pass);
+    }
+  }catch(err){
+    alert(err.message);
   }
 }
-</script>
 
+function bindRealtime(){
+  // orders
+  appState.unsubscribers.push(
+    db.collection('orders').onSnapshot(snap => {
+      appState.orders = snap.docs.map(doc => {
+        const d = doc.data();
+        return {
+          id: doc.id,
+          ...d,
+          createdAtMs: d.createdAt?.toMillis ? d.createdAt.toMillis() : 0
+        };
+      });
+      renderOrders();
+    })
+  );
+
+  appState.unsubscribers.push(
+    db.collection('stores').onSnapshot(snap => {
+      appState.stores = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderSelectOptions();
+      renderLists();
+      updateAnalytics();
+    })
+  );
+
+  appState.unsubscribers.push(
+    db.collection('suppliers').onSnapshot(snap => {
+      appState.suppliers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderSelectOptions();
+      renderLists();
+      updateAnalytics();
+    })
+  );
+}
+
+function bindTableEvents(){
+  el('ordersBody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    const row = e.target.closest('tr[data-id]');
+    if(btn){
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if(action === 'edit') return openOrderModal(id);
+      if(action === 'delete'){
+        appState.currentOrderId = id;
+        return deleteOrder();
+      }
+      if(action === 'copyttn') return copyTtn(id);
+      if(action === 'set-status'){
+        return setOrderStatus(id, btn.dataset.status);
+      }
+    }
+    if(row) openOrderModal(row.dataset.id);
+  });
+
+  el('ordersBody').addEventListener('mousedown', (e) => {
+    const btn = e.target.closest('button');
+    if(btn) e.stopPropagation();
+  });
+
+  el('ordersBody').addEventListener('dblclick', (e) => {
+    const row = e.target.closest('tr[data-id]');
+    if(row) openOrderModal(row.dataset.id);
+  });
+}
+
+function openOrderModal(id){
+  appState.currentOrderId = id;
+  const o = appState.orders.find(x => x.id === id);
+  if(!o) return;
+  el('mProduct').value = o.product || '';
+  el('mStore').value = o.store || '';
+  el('mSupplier').value = o.supplier || '';
+  el('mClient').value = o.client || '';
+  el('mPhone').value = o.phone || '';
+  el('mDate').value = (o.date || new Date().toISOString().slice(0,10)).slice(0,10);
+  el('mPrice').value = (o.priceKop || 0) / 100;
+  el('mCost').value = (o.costKop || 0) / 100;
+  el('mAds').value = (o.adsKop || 0) / 100;
+  el('mStatus').value = o.status || 'new';
+  el('mPaid').value = o.paid || 'no';
+  el('mNotes').value = o.notes || '';
+  el('mTtn').value = o.ttn || '';
+  el('mTtnStatus').value = o.ttnStatus || 'none';
+  el('metaSum').textContent = money(o.priceKop || 0);
+  el('metaProfit').textContent = money(calcProfitKop(o));
+  el('metaTtn').textContent = o.ttn || '—';
+  el('metaTtnStatus').textContent = TTN_LABELS[o.ttnStatus || 'none'];
+  el('orderModal').classList.add('open');
+}
+
+async function persistOnAuth(user){
+  if(!user){
+    appState.user = null;
+    appState.orders = [];
+    appState.stores = [];
+    appState.suppliers = [];
+    appState.unsubscribers.forEach(u => { try{u && u();}catch(_){} });
+    appState.unsubscribers = [];
+    showLogin();
+    return;
+  }
+  appState.user = user;
+  el('greeting').textContent = `Логін: ${user.email}`;
+  showApp();
+  bindRealtime();
+  setTab('orders');
+  // seed defaults on first run if collections empty
+  const [oSnap, sSnap, supSnap] = await Promise.all([
+    db.collection('orders').limit(1).get(),
+    db.collection('stores').limit(1).get(),
+    db.collection('suppliers').limit(1).get()
+  ]);
+  if (sSnap.empty) {
+    await db.collection('stores').add({ name:'Основний магазин', note:'За замовчуванням', tag:'main', createdAt: FieldValue.serverTimestamp() });
+  }
+  if (supSnap.empty) {
+    await db.collection('suppliers').add({ name:'Основний постачальник', note:'За замовчуванням', tag:'base', createdAt: FieldValue.serverTimestamp() });
+  }
+}
+
+async function bootstrap(){
+  bindCommonUI();
+  bindTableEvents();
+  resetOrderForm();
+
+  auth.onAuthStateChanged(async user => {
+    if(user) {
+      await persistOnAuth(user);
+    } else {
+      persistOnAuth(null);
+    }
+  });
+}
+
+bootstrap();
+</script>
 </body>
 </html>
