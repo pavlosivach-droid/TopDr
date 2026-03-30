@@ -1,1182 +1,203 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TopDr CRM</title>
-  <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #111a2d;
-      --panel-2: #18233a;
-      --panel-3: #1f2a44;
-      --line: rgba(255,255,255,0.08);
-      --text: #e5eefc;
-      --muted: #9fb0d0;
-      --accent: #4f8cff;
-      --accent-2: #22c55e;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --chip: #24324f;
-      --shadow: 0 18px 40px rgba(0,0,0,.35);
-      --radius: 18px;
-    }
+<meta charset="UTF-8">
+<title>TopDr CRM v3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(79,140,255,.16), transparent 28%),
-        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 24%),
-        var(--bg);
-      color: var(--text);
-    }
+<style>
+body { background:#0f172a; color:white; font-family:Arial; margin:0; }
+.container { padding:20px; }
+h1 { text-align:center; }
 
-    button, input, select, textarea {
-      font: inherit;
-    }
+input, select {
+  padding:8px; margin:5px; border-radius:6px; border:none;
+}
 
-    .hidden { display: none !important; }
+button {
+  padding:8px 12px; border:none; border-radius:6px;
+  background:#3b82f6; color:white; cursor:pointer;
+}
 
-    /* Login */
-    .login-wrap {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    .login-card {
-      width: min(460px, 100%);
-      background: linear-gradient(180deg, rgba(24,35,58,.92), rgba(17,26,45,.95));
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      padding: 28px;
-    }
-    .brand {
-      display:flex; align-items:center; gap:12px; margin-bottom: 18px;
-    }
-    .brand-badge {
-      width: 46px; height: 46px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      display:grid; place-items:center; font-weight: 800;
-      box-shadow: 0 12px 30px rgba(79,140,255,.35);
-    }
-    .brand h1 { font-size: 22px; margin: 0; }
-    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+table {
+  width:100%; margin-top:20px; border-collapse: collapse;
+}
 
-    .field {
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-bottom: 14px;
-    }
-    .field label { font-size: 13px; color: var(--muted); }
-    .field input, .field select, .field textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #0d1526;
-      color: var(--text);
-      border-radius: 12px;
-      padding: 12px 14px;
-      outline: none;
-    }
-    .field textarea { min-height: 92px; resize: vertical; }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      border-color: rgba(79,140,255,.7);
-      box-shadow: 0 0 0 3px rgba(79,140,255,.12);
-    }
+td, th {
+  padding:10px; border-bottom:1px solid #1e293b;
+}
 
-    .btn-row { display:flex; gap: 10px; flex-wrap: wrap; }
-    .btn {
-      border: none;
-      background: var(--panel-3);
-      color: var(--text);
-      padding: 11px 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: .15s ease;
-    }
-    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .btn.primary { background: linear-gradient(135deg, var(--accent), #6a5cff); }
-    .btn.success { background: linear-gradient(135deg, var(--accent-2), #16a34a); }
-    .btn.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
-    .btn.ghost { background: transparent; border: 1px solid var(--line); }
+tr:hover { background:#1e293b; cursor:pointer; }
 
-    .login-note {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(79,140,255,.08);
-      border: 1px solid rgba(79,140,255,.18);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
+.modal {
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none; justify-content:center; align-items:center;
+}
 
-    /* App layout */
-    .app {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 260px 1fr;
-    }
-    .sidebar {
-      background: linear-gradient(180deg, rgba(17,26,45,.97), rgba(13,21,38,.99));
-      border-right: 1px solid var(--line);
-      padding: 18px 14px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow: auto;
-    }
-    .sidebar .brand { margin-bottom: 22px; }
-    .nav {
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .nav button {
-      text-align:left;
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text);
-      cursor: pointer;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .nav button:hover { background: rgba(255,255,255,.04); }
-    .nav button.active {
-      background: linear-gradient(135deg, rgba(79,140,255,.18), rgba(79,140,255,.08));
-      border-color: rgba(79,140,255,.25);
-    }
-    .nav .hint {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .main {
-      padding: 18px;
-      min-width: 0;
-    }
-
-    .topbar {
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      align-items:center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .title-box h2 {
-      margin: 0;
-      font-size: 26px;
-    }
-    .title-box p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, rgba(24,35,58,.94), rgba(17,26,45,.96));
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    .toolbar {
-      display:grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
-      gap:10px;
-      padding: 14px;
-      margin-bottom: 16px;
-      align-items:end;
-    }
-    .toolbar .field { margin: 0; }
-    .toolbar .field input,
-    .toolbar .field select {
-      padding: 11px 12px;
-      border-radius: 12px;
-    }
-
-    .section {
-      display:none;
-    }
-    .section.active { display:block; }
-
-    .section-head {
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 0 0 12px;
-    }
-    .section-head h3 {
-      margin: 0;
-      font-size: 18px;
-    }
-    .section-head .muted { color: var(--muted); font-size: 13px; }
-
-    .filter-grid {
-      display:grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr auto;
-      gap:10px;
-      margin-bottom: 12px;
-    }
-
-    .table-wrap {
-      overflow:auto;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: rgba(7,12,22,.18);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1200px;
-    }
-    thead th {
-      position: sticky;
-      top: 0;
-      background: #10192b;
-      text-align: left;
-      font-size: 12px;
-      letter-spacing: .02em;
-      color: #c7d5f5;
-      padding: 14px 12px;
-      border-bottom: 1px solid var(--line);
-      z-index: 1;
-      white-space: nowrap;
-    }
-    tbody td {
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,.05);
-      vertical-align: top;
-      color: #e7eeff;
-      font-size: 13px;
-    }
-    tbody tr:hover { background: rgba(255,255,255,.03); }
-
-    .chip {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--chip);
-      color: #d9e5ff;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .chip.ok { background: rgba(34,197,94,.15); color: #8df0ad; }
-    .chip.warn { background: rgba(245,158,11,.15); color: #ffd28b; }
-    .chip.bad { background: rgba(239,68,68,.15); color: #ffb1b1; }
-    .chip.info { background: rgba(79,140,255,.15); color: #a9c8ff; }
-
-    .inline-select {
-      background: #10192b;
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 10px;
-      padding: 8px 10px;
-    }
-
-    .actions {
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .cards-grid {
-      display:grid;
-      grid-template-columns: repeat(4, minmax(240px, 1fr));
-      gap: 12px;
-    }
-    .kpi {
-      padding: 16px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(31,42,68,.95), rgba(18,27,45,.95));
-      border: 1px solid var(--line);
-    }
-    .kpi .label { color: var(--muted); font-size: 13px; }
-    .kpi .value { margin-top: 8px; font-size: 28px; font-weight: 800; }
-    .kpi .sub { margin-top: 6px; color: var(--muted); font-size: 12px; }
-
-    .analytics-grid {
-      display:grid;
-      grid-template-columns: 1.4fr .9fr;
-      gap: 14px;
-      align-items:start;
-    }
-    .analytics-box {
-      padding: 16px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(31,42,68,.95), rgba(18,27,45,.95));
-      border: 1px solid var(--line);
-    }
-    .analytics-box h4 { margin: 0 0 12px; }
-    .analytics-box .row {
-      display:flex; justify-content:space-between; gap: 16px;
-      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06);
-      color: #e8efff;
-      font-size: 14px;
-    }
-    .analytics-box .row:last-child { border-bottom: none; }
-    .analytics-box .muted { color: var(--muted); }
-
-    .store-list, .supplier-list {
-      display:flex; flex-direction:column; gap:8px;
-      margin-top: 10px;
-    }
-    .list-item {
-      display:flex; justify-content:space-between; gap:10px; align-items:center;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.06);
-    }
-    .list-item small { color: var(--muted); }
-
-    .drawer {
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    .drawer .field { margin-bottom: 0; }
-
-    .footer-note {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 1200px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar { position: relative; height: auto; }
-      .toolbar { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .analytics-grid, .cards-grid, .drawer { grid-template-columns: 1fr; }
-      .filter-grid { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 700px) {
-      .main { padding: 12px; }
-      .toolbar, .filter-grid { grid-template-columns: 1fr; }
-      .title-box h2 { font-size: 22px; }
-      .topbar { align-items:flex-start; }
-    }
-  </style>
+.modal-content {
+  background:#1e293b; padding:20px;
+  border-radius:10px; width:320px;
+}
+</style>
 </head>
+
 <body>
-  <div id="loginScreen" class="login-wrap">
-    <div class="login-card">
-      <div class="brand">
-        <div class="brand-badge">T</div>
-        <div>
-          <h1>TopDr CRM</h1>
-          <p>Темна CRM для замовлень, аналітики та обліку</p>
-        </div>
-      </div>
 
-      <div class="field">
-        <label>Логін</label>
-        <input id="loginUser" autocomplete="username" placeholder="admin" />
-      </div>
-      <div class="field">
-        <label>Пароль</label>
-        <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
-      </div>
-      <div class="btn-row">
-        <button class="btn primary" id="btnLogin">Увійти</button>
-        <button class="btn ghost" id="btnSeed">Створити тестовий доступ</button>
-      </div>
-      <div class="login-note">
-        Це локальний логін у браузері. Для справжньої багатокористувацької безпеки потрібен сервер і база. Тут доступ працює швидко, щоб уже користуватись CRM і потім підключити API.
-      </div>
-      <div class="footer-note">
-        Доступ за замовчуванням: <b>admin</b> / <b>1234</b> (якщо ти натиснеш “Створити тестовий доступ”).
-      </div>
-    </div>
-  </div>
-
-  <div id="app" class="app hidden">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-badge">T</div>
-        <div>
-          <h1>TopDr CRM</h1>
-          <p id="userGreeting">Вітаю!</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button data-tab="orders" class="active">Замовлення <span class="hint">список</span></button>
-        <button data-tab="analytics">Аналітика <span class="hint">прибуток / реклама</span></button>
-        <button data-tab="stores">Магазини <span class="hint">список</span></button>
-        <button data-tab="suppliers">Постачальники <span class="hint">список</span></button>
-        <button data-tab="settings">Налаштування <span class="hint">логін / резерв</span></button>
-      </div>
-      <div style="margin-top:18px;">
-        <button class="btn danger" id="logoutBtn" style="width:100%;">Вийти</button>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="topbar">
-        <div class="title-box">
-          <h2 id="pageTitle">Замовлення</h2>
-          <p id="pageSubtitle">Список замовлень як у сучасній CRM. Дані зберігаються локально і можуть бути експортовані в Excel.</p>
-        </div>
-        <div class="btn-row" id="topActions">
-          <button class="btn ghost" id="exportBtn">Резервна копія Excel</button>
-          <button class="btn ghost" id="importBtn">Імпорт JSON</button>
-          <button class="btn success" id="openAddBtn">+ Додати замовлення</button>
-        </div>
-      </div>
-
-      <section id="ordersSection" class="section active">
-        <div class="panel" id="ordersPanel">
-          <div id="orderFormArea" class="toolbar">
-            <div class="field"><input id="fProduct" placeholder="Назва товару"></div>
-            <div class="field"><input id="fStore" list="storesDatalist" placeholder="Назва магазину"></div>
-            <div class="field"><input id="fClient" placeholder="Клієнт"></div>
-            <div class="field"><input id="fPhone" placeholder="Телефон"></div>
-            <div class="field"><input id="fPrice" type="number" step="0.01" placeholder="Ціна, грн"></div>
-            <div class="field"><input id="fCost" type="number" step="0.01" placeholder="Закупка, грн"></div>
-            <div class="field"><input id="fAds" type="number" step="0.01" placeholder="Реклама, грн"></div>
-            <div class="field"><input id="fSupplier" list="suppliersDatalist" placeholder="Постачальник"></div>
-            <div class="field"><select id="fStatus"><option value="new">Новий</option><option value="work">В роботі</option><option value="sent">Відправлено</option><option value="done">Завершено</option><option value="cancel">Скасовано</option></select></div>
-            <div class="field"><select id="fPaid"><option value="no">Не оплачено</option><option value="yes">Оплачено</option></select></div>
-            <div class="field"><input id="fDate" type="date"></div>
-            <div class="field"><input id="fNotes" placeholder="Коментар"></div>
-            <div class="btn-row" style="grid-column: 1 / -1; justify-content:flex-end;">
-              <button class="btn ghost" id="resetOrderBtn" type="button">Скинути</button>
-              <button class="btn success" id="addOrderBtn" type="button">Додати замовлення</button>
-            </div>
-          </div>
-
-          <div class="section-head" style="padding:0 14px 14px;">
-            <div>
-              <h3>Список замовлень</h3>
-              <div class="muted">Фільтруй по магазину, постачальнику, статусу та періоду.</div>
-            </div>
-          </div>
-
-          <div style="padding:0 14px 14px;">
-            <div class="filter-grid">
-              <div class="field"><input id="searchOrder" placeholder="Пошук товару / клієнта / телефону"></div>
-              <div class="field"><select id="filterStore"><option value="all">Всі магазини</option></select></div>
-              <div class="field"><select id="filterSupplier"><option value="all">Всі постачальники</option></select></div>
-              <div class="field"><select id="filterStatus"><option value="all">Всі статуси</option><option value="new">Новий</option><option value="work">В роботі</option><option value="sent">Відправлено</option><option value="done">Завершено</option><option value="cancel">Скасовано</option></select></div>
-              <div class="field"><input id="filterFrom" type="date"></div>
-              <div class="field"><input id="filterTo" type="date"></div>
-            </div>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Дата</th>
-                  <th>Товар</th>
-                  <th>Магазин</th>
-                  <th>Клієнт</th>
-                  <th>Телефон</th>
-                  <th>Постачальник</th>
-                  <th>Ціна</th>
-                  <th>Закупка</th>
-                  <th>Реклама</th>
-                  <th>Прибуток</th>
-                  <th>Статус</th>
-                  <th>Оплата</th>
-                  <th>Дії</th>
-                </tr>
-              </thead>
-              <tbody id="ordersBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section id="analyticsSection" class="section">
-        <div class="section-head">
-          <div>
-            <h3>Аналітика</h3>
-            <div class="muted">Точно до копійки. Фільтр працює по магазинах, постачальниках і періоду.</div>
-          </div>
-        </div>
-
-        <div class="panel" style="padding:14px; margin-bottom:14px;">
-          <div class="filter-grid" style="margin-bottom:0;">
-            <div class="field"><select id="anStore"><option value="all">Всі магазини</option></select></div>
-            <div class="field"><select id="anSupplier"><option value="all">Всі постачальники</option></select></div>
-            <div class="field"><select id="anStatus"><option value="all">Всі статуси</option><option value="new">Новий</option><option value="work">В роботі</option><option value="sent">Відправлено</option><option value="done">Завершено</option><option value="cancel">Скасовано</option></select></div>
-            <div class="field"><input id="anFrom" type="date"></div>
-            <div class="field"><input id="anTo" type="date"></div>
-            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
-              <button class="btn ghost" id="anReset">Скинути фільтри</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="cards-grid" style="margin-bottom:14px;">
-          <div class="kpi"><div class="label">Оборот</div><div class="value" id="kpiTurnover">₴0.00</div><div class="sub">Сума всіх замовлень</div></div>
-          <div class="kpi"><div class="label">Прибуток</div><div class="value" id="kpiProfit">₴0.00</div><div class="sub">Після закупки та реклами</div></div>
-          <div class="kpi"><div class="label">Реклама</div><div class="value" id="kpiAds">₴0.00</div><div class="sub">Усі рекламні витрати</div></div>
-          <div class="kpi"><div class="label">Замовлення</div><div class="value" id="kpiCount">0</div><div class="sub">Кількість по фільтру</div></div>
-        </div>
-
-        <div class="analytics-grid">
-          <div class="analytics-box">
-            <h4>Підсумок</h4>
-            <div class="row"><span class="muted">Оборот</span><b id="sumTurnover">₴0.00</b></div>
-            <div class="row"><span class="muted">Закупка</span><b id="sumCost">₴0.00</b></div>
-            <div class="row"><span class="muted">Реклама</span><b id="sumAds">₴0.00</b></div>
-            <div class="row"><span class="muted">Прибуток</span><b id="sumProfit">₴0.00</b></div>
-            <div class="row"><span class="muted">Оплачені</span><b id="sumPaid">0</b></div>
-            <div class="row"><span class="muted">Неоплачені</span><b id="sumUnpaid">0</b></div>
-          </div>
-          <div class="analytics-box">
-            <h4>Коротка статистика</h4>
-            <div class="row"><span class="muted">Середній чек</span><b id="avgCheck">₴0.00</b></div>
-            <div class="row"><span class="muted">Середній прибуток</span><b id="avgProfit">₴0.00</b></div>
-            <div class="row"><span class="muted">Маржинальність</span><b id="marginPct">0%</b></div>
-            <div class="row"><span class="muted">Кількість магазинів</span><b id="storeCount">0</b></div>
-            <div class="row"><span class="muted">Кількість постачальників</span><b id="supplierCount">0</b></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="storesSection" class="section">
-        <div class="section-head">
-          <div>
-            <h3>Магазини</h3>
-            <div class="muted">Список магазинів, який використовується у фільтрах і замовленнях.</div>
-          </div>
-        </div>
-        <div class="panel" style="padding:14px;">
-          <div class="drawer" style="margin-bottom:12px;">
-            <div class="field"><input id="newStoreName" placeholder="Назва магазину"></div>
-            <div class="field"><input id="newStoreNote" placeholder="Примітка"></div>
-            <div class="field"><input id="newStoreTag" placeholder="Тег / код"></div>
-            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
-              <button class="btn success" id="addStoreBtn">Додати магазин</button>
-            </div>
-          </div>
-          <div id="storesList" class="store-list"></div>
-        </div>
-      </section>
-
-      <section id="suppliersSection" class="section">
-        <div class="section-head">
-          <div>
-            <h3>Постачальники</h3>
-            <div class="muted">Постачальники зберігаються як список і доступні в замовленнях.</div>
-          </div>
-        </div>
-        <div class="panel" style="padding:14px;">
-          <div class="drawer" style="margin-bottom:12px;">
-            <div class="field"><input id="newSupplierName" placeholder="Назва постачальника"></div>
-            <div class="field"><input id="newSupplierNote" placeholder="Коментар"></div>
-            <div class="field"><input id="newSupplierTag" placeholder="Тег / код"></div>
-            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
-              <button class="btn success" id="addSupplierBtn">Додати постачальника</button>
-            </div>
-          </div>
-          <div id="suppliersList" class="supplier-list"></div>
-        </div>
-      </section>
-
-      <section id="settingsSection" class="section">
-        <div class="section-head">
-          <div>
-            <h3>Налаштування</h3>
-            <div class="muted">Логін, зміна пароля, резервні копії та очищення бази.</div>
-          </div>
-        </div>
-        <div class="panel" style="padding:14px;">
-          <div class="drawer" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom:12px;">
-            <div class="field"><input id="setLogin" placeholder="Новий логін"></div>
-            <div class="field"><input id="setPass" type="password" placeholder="Новий пароль"></div>
-            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
-              <button class="btn success" id="saveCredsBtn">Зберегти логін / пароль</button>
-            </div>
-          </div>
-          <div class="btn-row">
-            <button class="btn ghost" id="exportJsonBtn">Експорт JSON</button>
-            <button class="btn ghost" id="exportExcelBtn2">Резервна копія Excel</button>
-            <button class="btn danger" id="clearBtn">Очистити всі дані</button>
-          </div>
-          <div class="footer-note">
-            Резервна копія Excel створюється у форматі .xlsx через SheetJS з точною сумою у копійках (зберігається як числа, без втрат).
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <datalist id="storesDatalist"></datalist>
-  <datalist id="suppliersDatalist"></datalist>
-
-  <input id="importFile" type="file" accept="application/json" class="hidden" />
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script>
-    const STORAGE_KEYS = {
-      user: 'td_user_v2',
-      orders: 'td_orders_v2',
-      stores: 'td_stores_v2',
-      suppliers: 'td_suppliers_v2',
-      session: 'td_session_v2'
-    };
-
-    const STATUS_LABELS = {
-      new: 'Новий',
-      work: 'В роботі',
-      sent: 'Відправлено',
-      done: 'Завершено',
-      cancel: 'Скасовано'
-    };
-
-    const STATUS_CLASS = {
-      new: 'info',
-      work: 'warn',
-      sent: 'info',
-      done: 'ok',
-      cancel: 'bad'
-    };
-
-    const state = {
-      orders: [],
-      stores: [],
-      suppliers: [],
-      user: null,
-      filters: {
-        search: '',
-        store: 'all',
-        supplier: 'all',
-        status: 'all',
-        from: '',
-        to: ''
-      },
-      analyticsFilters: {
-        store: 'all',
-        supplier: 'all',
-        status: 'all',
-        from: '',
-        to: ''
-      },
-      tab: 'orders'
-    };
-
-    const el = (id) => document.getElementById(id);
-    const money = (kop) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((kop || 0) / 100);
-    const num = (v) => {
-      const n = Number(String(v).replace(',', '.'));
-      return Number.isFinite(n) ? Math.round(n * 100) : 0;
-    };
-    const safe = (s) => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    const uid = () => Math.random().toString(36).slice(2, 11);
-
-    function loadData() {
-      state.user = JSON.parse(localStorage.getItem(STORAGE_KEYS.user) || 'null');
-      state.orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.orders) || '[]');
-      state.stores = JSON.parse(localStorage.getItem(STORAGE_KEYS.stores) || '[]');
-      state.suppliers = JSON.parse(localStorage.getItem(STORAGE_KEYS.suppliers) || '[]');
-      const session = JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || 'null');
-      return session;
-    }
-
-    function saveAll() {
-      localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(state.orders));
-      localStorage.setItem(STORAGE_KEYS.stores, JSON.stringify(state.stores));
-      localStorage.setItem(STORAGE_KEYS.suppliers, JSON.stringify(state.suppliers));
-      localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(state.user));
-    }
-
-    function ensureSeedUser() {
-      if (!state.user) {
-        state.user = { username: 'admin', password: '1234' };
-        localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(state.user));
-      }
-    }
-
-    function login(username, password) {
-      ensureSeedUser();
-      return state.user.username === username && state.user.password === password;
-    }
-
-    function setSession(on) {
-      if (on) localStorage.setItem(STORAGE_KEYS.session, JSON.stringify({ ok: true }));
-      else localStorage.removeItem(STORAGE_KEYS.session);
-    }
-
-    function isLogged() {
-      return !!JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || 'null');
-    }
-
-    function showApp() {
-      el('loginScreen').classList.add('hidden');
-      el('app').classList.remove('hidden');
-      el('userGreeting').textContent = `Логін: ${state.user?.username || 'admin'}`;
-    }
-
-    function showLogin() {
-      el('app').classList.add('hidden');
-      el('loginScreen').classList.remove('hidden');
-    }
-
-    function initDefaults() {
-      ensureSeedUser();
-      if (!state.stores.length) {
-        state.stores = [
-          { id: uid(), name: 'Основний магазин', note: 'За замовчуванням', tag: 'main' }
-        ];
-      }
-      if (!state.suppliers.length) {
-        state.suppliers = [
-          { id: uid(), name: 'Постачальник 1', note: 'За замовчуванням', tag: 's1' }
-        ];
-      }
-      saveAll();
-    }
-
-    function setTab(tab) {
-      state.tab = tab;
-      document.querySelectorAll('.nav button[data-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-      el(tab + 'Section').classList.add('active');
-
-      const titles = {
-        orders: ['Замовлення', 'Список замовлень як у сучасної CRM. Верхній блок тільки тут.'],
-        analytics: ['Аналітика', 'Підрахунки по фільтрах, за датами та по магазинах / постачальниках.'],
-        stores: ['Магазини', 'Список магазинів для вибору в замовленнях та аналітиці.'],
-        suppliers: ['Постачальники', 'Список постачальників для вибору в замовленнях та аналітиці.'],
-        settings: ['Налаштування', 'Логін, пароль, резервні копії та очищення бази.']
-      };
-      el('pageTitle').textContent = titles[tab][0];
-      el('pageSubtitle').textContent = titles[tab][1];
-      el('topActions').classList.toggle('hidden', tab !== 'orders');
-      el('orderFormArea').classList.toggle('hidden', tab !== 'orders');
-    }
-
-    function orderMatches(order, filters) {
-      const q = (filters.search || '').trim().toLowerCase();
-      const d = order.date || '';
-      const inFrom = !filters.from || d >= filters.from;
-      const inTo = !filters.to || d <= filters.to;
-      const inStore = filters.store === 'all' || order.store === filters.store;
-      const inSup = filters.supplier === 'all' || order.supplier === filters.supplier;
-      const inStatus = filters.status === 'all' || order.status === filters.status;
-      const qMatch = !q || [order.product, order.client, order.phone, order.store, order.supplier, order.notes].join(' ').toLowerCase().includes(q);
-      return inFrom && inTo && inStore && inSup && inStatus && qMatch;
-    }
-
-    function filteredOrders(filters) {
-      return state.orders.filter(o => orderMatches(o, filters));
-    }
-
-    function calcSummary(rows) {
-      return rows.reduce((acc, o) => {
-        const price = o.priceKop || 0;
-        const cost = o.costKop || 0;
-        const ads = o.adsKop || 0;
-        acc.turnover += price;
-        acc.cost += cost;
-        acc.ads += ads;
-        acc.profit += price - cost - ads;
-        acc.paid += o.paid === 'yes' ? 1 : 0;
-        acc.unpaid += o.paid !== 'yes' ? 1 : 0;
-        acc.count += 1;
-        return acc;
-      }, { turnover: 0, cost: 0, ads: 0, profit: 0, paid: 0, unpaid: 0, count: 0 });
-    }
-
-    function renderDatalists() {
-      const storesHtml = state.stores.map(s => `<option value="${safe(s.name)}"></option>`).join('');
-      const supHtml = state.suppliers.map(s => `<option value="${safe(s.name)}"></option>`).join('');
-      el('storesDatalist').innerHTML = storesHtml;
-      el('suppliersDatalist').innerHTML = supHtml;
-
-      const selectOptions = (items, selectedAllLabel) => `<option value="all">${selectedAllLabel}</option>` + items.map(x => `<option value="${safe(x.name)}">${safe(x.name)}</option>`).join('');
-      el('filterStore').innerHTML = selectOptions(state.stores, 'Всі магазини');
-      el('filterSupplier').innerHTML = selectOptions(state.suppliers, 'Всі постачальники');
-      el('anStore').innerHTML = selectOptions(state.stores, 'Всі магазини');
-      el('anSupplier').innerHTML = selectOptions(state.suppliers, 'Всі постачальники');
-    }
-
-    function renderOrders() {
-      const tbody = el('ordersBody');
-      const rows = filteredOrders(state.filters).sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-      tbody.innerHTML = rows.map(order => {
-        const profitKop = (order.priceKop || 0) - (order.costKop || 0) - (order.adsKop || 0);
-        return `
-          <tr>
-            <td>${safe(order.date || '')}</td>
-            <td><b>${safe(order.product)}</b><div class="muted">${safe(order.notes || '')}</div></td>
-            <td>${safe(order.store || '')}</td>
-            <td>${safe(order.client || '')}</td>
-            <td>${safe(order.phone || '')}</td>
-            <td>${safe(order.supplier || '')}</td>
-            <td>${money(order.priceKop)}</td>
-            <td>${money(order.costKop)}</td>
-            <td>${money(order.adsKop)}</td>
-            <td><b>${money(profitKop)}</b></td>
-            <td>
-              <select class="inline-select" data-act="status" data-id="${order.id}">
-                ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${order.status===k?'selected':''}>${v}</option>`).join('')}
-              </select>
-            </td>
-            <td>
-              <span class="chip ${order.paid === 'yes' ? 'ok' : 'warn'}">${order.paid === 'yes' ? 'Оплачено' : 'Не оплачено'}</span>
-            </td>
-            <td>
-              <div class="actions">
-                <button class="btn ghost" data-act="pay" data-id="${order.id}">${order.paid === 'yes' ? 'Зняти оплату' : 'Оплатити'}</button>
-                <button class="btn danger" data-act="delete" data-id="${order.id}">Видалити</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function updateAnalytics() {
-      const rows = filteredOrders(state.analyticsFilters);
-      const s = calcSummary(rows);
-      el('kpiTurnover').textContent = money(s.turnover);
-      el('kpiProfit').textContent = money(s.profit);
-      el('kpiAds').textContent = money(s.ads);
-      el('kpiCount').textContent = s.count;
-      el('sumTurnover').textContent = money(s.turnover);
-      el('sumCost').textContent = money(s.cost);
-      el('sumAds').textContent = money(s.ads);
-      el('sumProfit').textContent = money(s.profit);
-      el('sumPaid').textContent = s.paid;
-      el('sumUnpaid').textContent = s.unpaid;
-      el('avgCheck').textContent = s.count ? money(Math.round(s.turnover / s.count)) : money(0);
-      el('avgProfit').textContent = s.count ? money(Math.round(s.profit / s.count)) : money(0);
-      const margin = s.turnover > 0 ? ((s.profit / s.turnover) * 100) : 0;
-      el('marginPct').textContent = `${margin.toFixed(1)}%`;
-      el('storeCount').textContent = state.stores.length;
-      el('supplierCount').textContent = state.suppliers.length;
-    }
-
-    function renderLists() {
-      el('storesList').innerHTML = state.stores.map(s => `
-        <div class="list-item">
-          <div>
-            <b>${safe(s.name)}</b><br>
-            <small>${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</small>
-          </div>
-          <button class="btn danger" data-remove-store="${s.id}">Видалити</button>
-        </div>
-      `).join('') || '<div class="muted">Ще немає магазинів.</div>';
-
-      el('suppliersList').innerHTML = state.suppliers.map(s => `
-        <div class="list-item">
-          <div>
-            <b>${safe(s.name)}</b><br>
-            <small>${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</small>
-          </div>
-          <button class="btn danger" data-remove-supplier="${s.id}">Видалити</button>
-        </div>
-      `).join('') || '<div class="muted">Ще немає постачальників.</div>';
-    }
-
-    function renderAll() {
-      renderDatalists();
-      renderOrders();
-      renderLists();
-      updateAnalytics();
-    }
-
-    function resetOrderForm() {
-      ['fProduct','fStore','fClient','fPhone','fPrice','fCost','fAds','fSupplier','fNotes'].forEach(id => el(id).value = '');
-      el('fStatus').value = 'new';
-      el('fPaid').value = 'no';
-      el('fDate').value = new Date().toISOString().slice(0,10);
-    }
-
-    function addOrder() {
-      const product = el('fProduct').value.trim();
-      if (!product) return alert('Вкажи назву товару');
-      const order = {
-        id: uid(),
-        date: el('fDate').value || new Date().toISOString().slice(0,10),
-        product,
-        store: el('fStore').value.trim(),
-        client: el('fClient').value.trim(),
-        phone: el('fPhone').value.trim(),
-        supplier: el('fSupplier').value.trim(),
-        priceKop: num(el('fPrice').value),
-        costKop: num(el('fCost').value),
-        adsKop: num(el('fAds').value),
-        status: el('fStatus').value,
-        paid: el('fPaid').value,
-        notes: el('fNotes').value.trim()
-      };
-      state.orders.unshift(order);
-      saveAll();
-      renderAll();
-      resetOrderForm();
-    }
-
-    function exportJSON() {
-      const blob = new Blob([JSON.stringify({ orders: state.orders, stores: state.stores, suppliers: state.suppliers, user: state.user }, null, 2)], { type: 'application/json;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      downloadUrl(url, `TopDr_backup_${new Date().toISOString().slice(0,10)}.json`);
-    }
-
-    function exportExcel() {
-      const rows = state.orders.map(o => ({
-        Дата: o.date || '',
-        Товар: o.product || '',
-        Магазин: o.store || '',
-        Клієнт: o.client || '',
-        Телефон: o.phone || '',
-        Постачальник: o.supplier || '',
-        Ціна_грн: (o.priceKop || 0) / 100,
-        Закупка_грн: (o.costKop || 0) / 100,
-        Реклама_грн: (o.adsKop || 0) / 100,
-        Прибуток_грн: ((o.priceKop || 0) - (o.costKop || 0) - (o.adsKop || 0)) / 100,
-        Статус: STATUS_LABELS[o.status] || o.status,
-        Оплата: o.paid === 'yes' ? 'Оплачено' : 'Не оплачено',
-        Коментар: o.notes || ''
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Orders');
-      const fileName = `TopDr_backup_${new Date().toISOString().slice(0,10)}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-    }
-
-    function downloadUrl(url, filename) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-    function handleTableAction(e) {
-      const act = e.target.dataset.act;
-      const id = e.target.dataset.id;
-      if (!act || !id) return;
-      const idx = state.orders.findIndex(o => o.id === id);
-      if (idx === -1) return;
-      if (act === 'delete') {
-        if (!confirm('Видалити замовлення?')) return;
-        state.orders.splice(idx, 1);
-      }
-      if (act === 'pay') {
-        state.orders[idx].paid = state.orders[idx].paid === 'yes' ? 'no' : 'yes';
-      }
-      saveAll();
-      renderAll();
-    }
-
-    function handleStatusChange(e) {
-      if (e.target.matches('select[data-act="status"]')) {
-        const id = e.target.dataset.id;
-        const order = state.orders.find(o => o.id === id);
-        if (!order) return;
-        order.status = e.target.value;
-        saveAll();
-        updateAnalytics();
-      }
-    }
-
-    function addStore() {
-      const name = el('newStoreName').value.trim();
-      if (!name) return alert('Вкажи назву магазину');
-      state.stores.push({ id: uid(), name, note: el('newStoreNote').value.trim(), tag: el('newStoreTag').value.trim() });
-      saveAll();
-      renderAll();
-      el('newStoreName').value = el('newStoreNote').value = el('newStoreTag').value = '';
-    }
-
-    function addSupplier() {
-      const name = el('newSupplierName').value.trim();
-      if (!name) return alert('Вкажи назву постачальника');
-      state.suppliers.push({ id: uid(), name, note: el('newSupplierNote').value.trim(), tag: el('newSupplierTag').value.trim() });
-      saveAll();
-      renderAll();
-      el('newSupplierName').value = el('newSupplierNote').value = el('newSupplierTag').value = '';
-    }
-
-    function saveCreds() {
-      const u = el('setLogin').value.trim();
-      const p = el('setPass').value.trim();
-      if (!u || !p) return alert('Вкажи логін і пароль');
-      state.user = { username: u, password: p };
-      saveAll();
-      alert('Логін / пароль збережено');
-    }
-
-    function clearAllData() {
-      if (!confirm('Точно очистити всі дані?')) return;
-      state.orders = [];
-      state.stores = [{ id: uid(), name: 'Основний магазин', note: 'За замовчуванням', tag: 'main' }];
-      state.suppliers = [{ id: uid(), name: 'Постачальник 1', note: 'За замовчуванням', tag: 's1' }];
-      saveAll();
-      renderAll();
-    }
-
-    function syncFilterInputs() {
-      state.filters.search = el('searchOrder').value;
-      state.filters.store = el('filterStore').value;
-      state.filters.supplier = el('filterSupplier').value;
-      state.filters.status = el('filterStatus').value;
-      state.filters.from = el('filterFrom').value;
-      state.filters.to = el('filterTo').value;
-
-      state.analyticsFilters.store = el('anStore').value;
-      state.analyticsFilters.supplier = el('anSupplier').value;
-      state.analyticsFilters.status = el('anStatus').value;
-      state.analyticsFilters.from = el('anFrom').value;
-      state.analyticsFilters.to = el('anTo').value;
-    }
-
-    function resetAnalyticsFilters() {
-      ['anStore','anSupplier','anStatus','anFrom','anTo'].forEach(id => el(id).value = (id === 'anStatus') ? 'all' : 'all');
-      el('anStore').value = 'all';
-      el('anSupplier').value = 'all';
-      el('anStatus').value = 'all';
-      el('anFrom').value = '';
-      el('anTo').value = '';
-      syncFilterInputs();
-      renderAll();
-    }
-
-    function bindEvents() {
-      document.querySelectorAll('.nav button[data-tab]').forEach(btn => btn.addEventListener('click', () => {
-        setTab(btn.dataset.tab);
-        syncFilterInputs();
-        renderAll();
-      }));
-
-      el('btnLogin').addEventListener('click', () => {
-        if (login(el('loginUser').value.trim(), el('loginPass').value)) {
-          setSession(true);
-          showApp();
-          setTab('orders');
-          renderAll();
-        } else {
-          alert('Невірний логін або пароль');
-        }
-      });
-
-      el('btnSeed').addEventListener('click', () => {
-        state.user = { username: 'admin', password: '1234' };
-        saveAll();
-        el('loginUser').value = 'admin';
-        el('loginPass').value = '1234';
-        alert('Створено доступ admin / 1234');
-      });
-
-      el('logoutBtn').addEventListener('click', () => {
-        setSession(false);
-        showLogin();
-      });
-
-      el('addOrderBtn').addEventListener('click', addOrder);
-      el('resetOrderBtn').addEventListener('click', resetOrderForm);
-      el('openAddBtn').addEventListener('click', () => {
-        setTab('orders');
-        el('fProduct').focus();
-      });
-
-      el('exportBtn').addEventListener('click', exportExcel);
-      el('exportJsonBtn').addEventListener('click', exportJSON);
-      el('exportExcelBtn2').addEventListener('click', exportExcel);
-      el('importBtn').addEventListener('click', () => el('importFile').click());
-      el('importFile').addEventListener('change', handleImportJSON);
-
-      el('searchOrder').addEventListener('input', () => { syncFilterInputs(); renderOrders(); });
-      ['filterStore','filterSupplier','filterStatus','filterFrom','filterTo'].forEach(id => el(id).addEventListener('change', () => { syncFilterInputs(); renderOrders(); }));
-      ['anStore','anSupplier','anStatus','anFrom','anTo'].forEach(id => el(id).addEventListener('change', () => { syncFilterInputs(); updateAnalytics(); }));
-      el('anReset').addEventListener('click', resetAnalyticsFilters);
-
-      el('ordersBody').addEventListener('click', handleTableAction);
-      el('ordersBody').addEventListener('change', handleStatusChange);
-      el('addStoreBtn').addEventListener('click', addStore);
-      el('addSupplierBtn').addEventListener('click', addSupplier);
-      el('saveCredsBtn').addEventListener('click', saveCreds);
-      el('clearBtn').addEventListener('click', clearAllData);
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !el('app').classList.contains('hidden') && state.tab === 'orders') {
-          const active = document.activeElement;
-          const isInput = active && ['INPUT','SELECT','TEXTAREA'].includes(active.tagName);
-          if (isInput && active.id !== 'searchOrder') {
-            // avoid accidental submits from filters/search
-          }
-        }
-      });
-    }
-
-    async function handleImportJSON(e) {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const text = await file.text();
-      try {
-        const parsed = JSON.parse(text);
-        if (parsed.orders) state.orders = parsed.orders;
-        if (parsed.stores) state.stores = parsed.stores;
-        if (parsed.suppliers) state.suppliers = parsed.suppliers;
-        if (parsed.user) state.user = parsed.user;
-        saveAll();
-        renderAll();
-        alert('Імпорт успішний');
-      } catch (err) {
-        alert('Не вдалося імпортувати JSON');
-      } finally {
-        e.target.value = '';
-      }
-    }
-
-    function start() {
-      const session = loadData();
-      initDefaults();
-      bindEvents();
-      resetOrderForm();
-      syncFilterInputs();
-      if (session && isLogged()) {
-        showApp();
-        renderAll();
-      } else {
-        showLogin();
-      }
-    }
-
-    start();
-  </script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<div class="container">
+<h1>CRM</h1>
+
+<input id="search" placeholder="Пошук...">
+
+<br>
+
+<input id="product" placeholder="Товар">
+<input id="client" placeholder="Клієнт">
+<input id="phone" placeholder="Телефон">
+<input id="price" placeholder="Ціна">
+
+<button onclick="addOrder()">Додати</button>
+
+<table>
+<thead>
+<tr>
+<th>Товар</th>
+<th>Клієнт</th>
+<th>Телефон</th>
+<th>Ціна</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody id="orders"></tbody>
+</table>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h3>Замовлення</h3>
+
+<input id="m_product">
+<input id="m_client">
+<input id="m_phone">
+<input id="m_price">
+<input id="m_ttn" placeholder="ТТН">
+
+<select id="m_status">
+<option>Новий</option>
+<option>В роботі</option>
+<option>Відправлено</option>
+<option>Завершено</option>
+</select>
+
+<br><br>
+
+<button onclick="saveOrder()">Зберегти</button>
+<button onclick="markDone()">Отримано</button>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAxbOlBZcd49xyhcSfOjjqWcUdwKAddwO0",
   authDomain: "topdr-crm.firebaseapp.com",
-  projectId: "topdr-crm",
-  storageBucket: "topdr-crm.firebasestorage.app",
-  messagingSenderId: "325192431795",
-  appId: "1:325192431795:web:191d35f730a243b36598c6"
+  projectId: "topdr-crm"
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.firestore();
-const auth = firebase.auth();
+
+let orders = [];
+let currentId = null;
+
+db.collection("orders").onSnapshot(snapshot=>{
+  orders = [];
+  snapshot.forEach(doc=>{
+    orders.push({id:doc.id, ...doc.data()});
+  });
+  renderOrders();
+});
+
+function addOrder(){
+  db.collection("orders").add({
+    product: product.value,
+    client: client.value,
+    phone: phone.value,
+    price: +price.value,
+    status:"Новий",
+    ttn:""
+  });
+}
+
+function renderOrders(){
+  const q = search.value.toLowerCase();
+  const table = document.getElementById("orders");
+  table.innerHTML="";
+
+  orders
+  .filter(o => 
+    o.product.toLowerCase().includes(q) ||
+    o.client.toLowerCase().includes(q) ||
+    o.phone.includes(q)
+  )
+  .forEach(o=>{
+    table.innerHTML += `
+      <tr onclick="openModal('${o.id}')">
+        <td>${o.product}</td>
+        <td>${o.client}</td>
+        <td>${o.phone}</td>
+        <td>${o.price}</td>
+        <td>${o.status}</td>
+      </tr>
+    `;
+  });
+}
+
+function openModal(id){
+  currentId = id;
+  const o = orders.find(x=>x.id==id);
+
+  m_product.value = o.product;
+  m_client.value = o.client;
+  m_phone.value = o.phone;
+  m_price.value = o.price;
+  m_status.value = o.status;
+  m_ttn.value = o.ttn || "";
+
+  modal.style.display="flex";
+}
+
+function saveOrder(){
+  db.collection("orders").doc(currentId).update({
+    product:m_product.value,
+    client:m_client.value,
+    phone:m_phone.value,
+    price:+m_price.value,
+    status:m_status.value,
+    ttn:m_ttn.value
+  });
+
+  modal.style.display="none";
+}
+
+function markDone(){
+  db.collection("orders").doc(currentId).update({
+    status:"Завершено"
+  });
+  modal.style.display="none";
+}
+
+search.oninput = renderOrders;
+
+window.onclick = (e)=>{
+  if(e.target.id==="modal"){
+    modal.style.display="none";
+  }
+}
 </script>
+
 </body>
 </html>
