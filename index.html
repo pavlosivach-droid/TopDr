@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TopDr CRM v4</title>
+<title>TopDr CRM</title>
 <style>
   :root{
     --bg:#0b1020;
@@ -69,7 +69,7 @@
     min-height:100vh; display:grid; place-items:center; padding:24px;
   }
   .login-card{
-    width:min(460px,100%); padding:28px; border-radius:24px; 
+    width:min(460px,100%); padding:28px; border-radius:24px;
     background:linear-gradient(180deg, rgba(24,35,58,.96), rgba(17,26,45,.98));
     border:1px solid var(--line); box-shadow:var(--shadow);
   }
@@ -376,7 +376,7 @@
             </div>
           </div>
           <div class="filters">
-            <div class="field"><input id="searchOrder" placeholder="Пошук товару / клієнта / телефону"></div>
+            <div class="field"><input id="searchOrder" placeholder="Пошук товару / клієнта / телефону / ТТН"></div>
             <div class="field"><select id="filterStore"><option value="all">Всі магазини</option></select></div>
             <div class="field"><select id="filterSupplier"><option value="all">Всі постачальники</option></select></div>
             <div class="field"><select id="filterStatus"><option value="all">Всі статуси</option></select></div>
@@ -601,7 +601,7 @@
           </div>
           <div class="meta-block">
             <b>Порада</b>
-            <div class="small">Якщо у ТТН статус “Отримано”, замовлення автоматично стане “Завершено”. Без API НП це керується вручну, але синхронно на всіх пристроях.</div>
+            <div class="small">Якщо у ТТН статус “Отримано”, замовлення автоматично стає “Завершено”. Без API НП це керується вручну, але синхронно на всіх пристроях.</div>
           </div>
         </div>
       </div>
@@ -645,18 +645,15 @@ const appState = {
 };
 
 const STATUS_LABELS = { new:'Новий', work:'В роботі', sent:'Відправлено', done:'Завершено', cancel:'Скасовано' };
-const STATUS_CLASS = { new:'info', work:'warn', sent:'info', done:'ok', cancel:'bad' };
 const TTN_LABELS = { none:'ТТН не створено', new:'ТТН створено', way:'В дорозі', received:'Отримано' };
 const TTN_CLASS = { none:'ttn-none', new:'ttn-new', way:'ttn-way', received:'ttn-received' };
 
 const el = (id) => document.getElementById(id);
-const qs = (s) => document.querySelector(s);
 const money = (kop) => new Intl.NumberFormat('uk-UA', { style:'currency', currency:'UAH', minimumFractionDigits:2, maximumFractionDigits:2 }).format((kop||0)/100);
 const toKop = (v) => {
   const n = Number(String(v ?? '').replace(',', '.'));
   return Number.isFinite(n) ? Math.round(n * 100) : 0;
 };
-const uid = () => Math.random().toString(36).slice(2, 11);
 const safe = (s) => String(s ?? '').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[m]));
 
 function showLogin(){ el('loginScreen').classList.remove('hidden'); el('app').classList.add('hidden'); }
@@ -863,12 +860,11 @@ function orderFormData(){
 async function addOrder(){
   const data = orderFormData();
   if(!data.product) return alert('Вкажи назву товару');
-  const ref = await db.collection('orders').add({
+  const ref = await db.collection('users').doc(appState.user.uid).collection('orders').add({
     ...data,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp()
   });
-  // If ttn status received, ensure done
   if (data.ttnStatus === 'received') {
     await ref.update({ status:'done', updatedAt: FieldValue.serverTimestamp() });
   }
@@ -879,7 +875,6 @@ function openOrderModal(id){
   appState.currentOrderId = id;
   const o = appState.orders.find(x => x.id === id);
   if(!o) return;
-
   el('mProduct').value = o.product || '';
   el('mStore').value = o.store || '';
   el('mSupplier').value = o.supplier || '';
@@ -894,24 +889,18 @@ function openOrderModal(id){
   el('mNotes').value = o.notes || '';
   el('mTtn').value = o.ttn || '';
   el('mTtnStatus').value = o.ttnStatus || 'none';
-
-  const profit = calcProfitKop(o);
   el('metaSum').textContent = money(o.priceKop || 0);
-  el('metaProfit').textContent = money(profit);
+  el('metaProfit').textContent = money(calcProfitKop(o));
   el('metaTtn').textContent = o.ttn || '—';
   el('metaTtnStatus').textContent = TTN_LABELS[o.ttnStatus || 'none'];
-
   el('orderModal').classList.add('open');
 }
 
-function closeModal(){ el('orderModal').classList.remove('open'); }
+async function closeModal(){ el('orderModal').classList.remove('open'); }
 
 async function saveOrder(){
   const id = appState.currentOrderId;
-  if(!id) return;
-  const o = appState.orders.find(x => x.id === id);
-  if(!o) return;
-
+  if(!id || !appState.user) return;
   const ttnStatus = el('mTtnStatus').value;
   const payload = {
     product: el('mProduct').value.trim(),
@@ -930,17 +919,19 @@ async function saveOrder(){
     ttnStatus,
     updatedAt: FieldValue.serverTimestamp()
   };
-  await db.collection('orders').doc(id).update(payload);
+  await db.collection('users').doc(appState.user.uid).collection('orders').doc(id).update(payload);
   if (ttnStatus === 'received') {
-    await db.collection('orders').doc(id).update({ status:'done', updatedAt: FieldValue.serverTimestamp() });
+    await db.collection('users').doc(appState.user.uid).collection('orders').doc(id).update({
+      status:'done', updatedAt: FieldValue.serverTimestamp()
+    });
   }
   closeModal();
 }
 
 async function markReceived(){
   const id = appState.currentOrderId;
-  if(!id) return;
-  await db.collection('orders').doc(id).update({
+  if(!id || !appState.user) return;
+  await db.collection('users').doc(appState.user.uid).collection('orders').doc(id).update({
     ttnStatus:'received',
     status:'done',
     updatedAt: FieldValue.serverTimestamp()
@@ -951,8 +942,8 @@ async function markReceived(){
 async function duplicateOrder(){
   const id = appState.currentOrderId;
   const o = appState.orders.find(x => x.id === id);
-  if(!o) return;
-  await db.collection('orders').add({
+  if(!o || !appState.user) return;
+  await db.collection('users').doc(appState.user.uid).collection('orders').add({
     product: o.product || '',
     store: o.store || '',
     supplier: o.supplier || '',
@@ -974,24 +965,16 @@ async function duplicateOrder(){
 
 async function deleteOrder(){
   const id = appState.currentOrderId;
-  if(!id) return;
+  if(!id || !appState.user) return;
   if(!confirm('Видалити замовлення?')) return;
-  await db.collection('orders').doc(id).delete();
+  await db.collection('users').doc(appState.user.uid).collection('orders').doc(id).delete();
   closeModal();
 }
 
 async function setOrderStatus(id, status){
-  await db.collection('orders').doc(id).update({
+  if(!appState.user) return;
+  await db.collection('users').doc(appState.user.uid).collection('orders').doc(id).update({
     status,
-    updatedAt: FieldValue.serverTimestamp()
-  });
-}
-
-async function togglePaid(id){
-  const o = appState.orders.find(x => x.id === id);
-  if(!o) return;
-  await db.collection('orders').doc(id).update({
-    paid: o.paid === 'yes' ? 'no' : 'yes',
     updatedAt: FieldValue.serverTimestamp()
   });
 }
@@ -1006,7 +989,7 @@ async function copyTtn(id){
 async function addStore(){
   const name = el('newStoreName').value.trim();
   if(!name) return alert('Вкажи назву магазину');
-  await db.collection('stores').add({
+  await db.collection('users').doc(appState.user.uid).collection('stores').add({
     name,
     note: el('newStoreNote').value.trim(),
     tag: el('newStoreTag').value.trim(),
@@ -1018,7 +1001,7 @@ async function addStore(){
 async function addSupplier(){
   const name = el('newSupplierName').value.trim();
   if(!name) return alert('Вкажи назву постачальника');
-  await db.collection('suppliers').add({
+  await db.collection('users').doc(appState.user.uid).collection('suppliers').add({
     name,
     note: el('newSupplierNote').value.trim(),
     tag: el('newSupplierTag').value.trim(),
@@ -1090,10 +1073,10 @@ function bindCommonUI(){
   el('exportJsonBtn').addEventListener('click', exportJSON);
   el('clearAllBtn').addEventListener('click', async () => {
     if(!confirm('Точно очистити всі дані?')) return;
+    if(!appState.user) return;
     const batch = db.batch();
-    const collections = ['orders','stores','suppliers'];
-    for (const c of collections) {
-      const snap = await db.collection(c).get();
+    for (const c of ['orders','stores','suppliers']) {
+      const snap = await db.collection('users').doc(appState.user.uid).collection(c).get();
       snap.forEach(doc => batch.delete(doc.ref));
     }
     await batch.commit();
@@ -1162,9 +1145,11 @@ async function signIn(register = false){
 }
 
 function bindRealtime(){
-  // orders
+  appState.unsubscribers.forEach(u => { try{u && u();}catch(_){} });
+  appState.unsubscribers = [];
+
   appState.unsubscribers.push(
-    db.collection('orders').onSnapshot(snap => {
+    db.collection('users').doc(appState.user.uid).collection('orders').onSnapshot(snap => {
       appState.orders = snap.docs.map(doc => {
         const d = doc.data();
         return {
@@ -1178,7 +1163,7 @@ function bindRealtime(){
   );
 
   appState.unsubscribers.push(
-    db.collection('stores').onSnapshot(snap => {
+    db.collection('users').doc(appState.user.uid).collection('stores').onSnapshot(snap => {
       appState.stores = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderSelectOptions();
       renderLists();
@@ -1187,7 +1172,7 @@ function bindRealtime(){
   );
 
   appState.unsubscribers.push(
-    db.collection('suppliers').onSnapshot(snap => {
+    db.collection('users').doc(appState.user.uid).collection('suppliers').onSnapshot(snap => {
       appState.suppliers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderSelectOptions();
       renderLists();
@@ -1220,11 +1205,6 @@ function bindTableEvents(){
   el('ordersBody').addEventListener('mousedown', (e) => {
     const btn = e.target.closest('button');
     if(btn) e.stopPropagation();
-  });
-
-  el('ordersBody').addEventListener('dblclick', (e) => {
-    const row = e.target.closest('tr[data-id]');
-    if(row) openOrderModal(row.dataset.id);
   });
 }
 
@@ -1269,17 +1249,21 @@ async function persistOnAuth(user){
   showApp();
   bindRealtime();
   setTab('orders');
-  // seed defaults on first run if collections empty
-  const [oSnap, sSnap, supSnap] = await Promise.all([
-    db.collection('orders').limit(1).get(),
-    db.collection('stores').limit(1).get(),
-    db.collection('suppliers').limit(1).get()
+
+  const [sSnap, supSnap] = await Promise.all([
+    db.collection('users').doc(user.uid).collection('stores').limit(1).get(),
+    db.collection('users').doc(user.uid).collection('suppliers').limit(1).get()
   ]);
+
   if (sSnap.empty) {
-    await db.collection('stores').add({ name:'Основний магазин', note:'За замовчуванням', tag:'main', createdAt: FieldValue.serverTimestamp() });
+    await db.collection('users').doc(user.uid).collection('stores').add({
+      name:'Основний магазин', note:'За замовчуванням', tag:'main', createdAt: FieldValue.serverTimestamp()
+    });
   }
   if (supSnap.empty) {
-    await db.collection('suppliers').add({ name:'Основний постачальник', note:'За замовчуванням', tag:'base', createdAt: FieldValue.serverTimestamp() });
+    await db.collection('users').doc(user.uid).collection('suppliers').add({
+      name:'Основний постачальник', note:'За замовчуванням', tag:'base', createdAt: FieldValue.serverTimestamp()
+    });
   }
 }
 
@@ -1289,11 +1273,8 @@ async function bootstrap(){
   resetOrderForm();
 
   auth.onAuthStateChanged(async user => {
-    if(user) {
-      await persistOnAuth(user);
-    } else {
-      persistOnAuth(null);
-    }
+    if(user) await persistOnAuth(user);
+    else await persistOnAuth(null);
   });
 }
 
