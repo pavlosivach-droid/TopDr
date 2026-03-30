@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>CRM</title>
+<style>
+body { font-family: Arial; padding: 20px; background:#f5f5f5; }
+h1 { text-align:center; }
+form, table { background:#fff; padding:15px; border-radius:10px; margin-bottom:20px; }
+input, select { padding:8px; margin:5px; }
+button { padding:10px; background:#2b5cff; color:#fff; border:none; border-radius:5px; }
+table { width:100%; border-collapse:collapse; }
+td, th { padding:10px; border-bottom:1px solid #ddd; text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>CRM</h1>
+
+<form id="form">
+<input placeholder="Товар" id="product" required>
+<input placeholder="Магазин" id="store">
+<input placeholder="Клієнт" id="client">
+<input placeholder="Телефон" id="phone">
+<input type="number" placeholder="Ціна" id="price">
+<input type="number" placeholder="Закупка" id="cost">
+<input type="number" placeholder="Реклама" id="ads">
+
+<select id="status">
+<option>Новий</option>
+<option>Відправлено</option>
+<option>Оплата</option>
+<option>Відмова</option>
+</select>
+
+<select id="paid">
+<option value="no">Не оплачено</option>
+<option value="yes">Оплачено</option>
+</select>
+
+<input placeholder="Постачальник" id="supplier">
+
+<button>Додати</button>
+</form>
+
+<table>
+<thead>
+<tr>
+<th>Товар</th><th>Магазин</th><th>Клієнт</th><th>Ціна</th>
+<th>Закупка</th><th>Реклама</th><th>Прибуток</th>
+<th>Статус</th><th>Оплата</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+
+<h2>Статистика</h2>
+<div id="stats"></div>
+
+<script>
+let data = JSON.parse(localStorage.getItem('crm') || '[]');
+
+const form = document.getElementById('form');
+const table = document.getElementById('table');
+const stats = document.getElementById('stats');
+
+function render() {
+table.innerHTML = '';
+let profit = 0, revenue = 0, ads = 0;
+
+data.forEach(d => {
+let p = d.price - d.cost - d.ads;
+profit += p;
+revenue += d.price;
+ads += d.ads;
+
+table.innerHTML += `
+<tr>
+<td>${d.product}</td>
+<td>${d.store}</td>
+<td>${d.client}</td>
+<td>${d.price}</td>
+<td>${d.cost}</td>
+<td>${d.ads}</td>
+<td>${p}</td>
+<td>${d.status}</td>
+<td>${d.paid}</td>
+</tr>`;
+});
+
+stats.innerHTML = `
+Оборот: ${revenue} грн<br>
+Прибуток: ${profit} грн<br>
+Реклама: ${ads} грн`;
+}
+
+form.onsubmit = e => {
+e.preventDefault();
+
+let obj = {
+product: product.value,
+store: store.value,
+client: client.value,
+phone: phone.value,
+price: +price.value,
+cost: +cost.value,
+ads: +ads.value,
+status: status.value,
+paid: paid.value,
+supplier: supplier.value
+};
+
+data.push(obj);
+localStorage.setItem('crm', JSON.stringify(data));
+form.reset();
+render();
+};
+
+render();
+</script>
+
+</body>
+</html>
