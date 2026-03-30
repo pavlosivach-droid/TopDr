@@ -3,118 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <title>CRM</title>
+
 <style>
-body { font-family: Arial; padding: 20px; background:#f5f5f5; }
-h1 { text-align:center; }
-form, table { background:#fff; padding:15px; border-radius:10px; margin-bottom:20px; }
-input, select { padding:8px; margin:5px; }
-button { padding:10px; background:#2b5cff; color:#fff; border:none; border-radius:5px; }
-table { width:100%; border-collapse:collapse; }
-td, th { padding:10px; border-bottom:1px solid #ddd; text-align:center; }
+body {
+  margin:0;
+  font-family: Arial;
+  background:#0f172a;
+  color:#fff;
+}
+
+h1 {
+  text-align:center;
+  padding:20px;
+}
+
+.container {
+  display:flex;
+  gap:15px;
+  padding:15px;
+  overflow-x:auto;
+}
+
+.column {
+  background:#1e293b;
+  padding:10px;
+  border-radius:10px;
+  width:300px;
+  min-height:400px;
+}
+
+.column h2 {
+  text-align:center;
+}
+
+.card {
+  background:#334155;
+  padding:10px;
+  margin:10px 0;
+  border-radius:10px;
+  cursor:grab;
+}
+
+.card small {
+  display:block;
+  color:#94a3b8;
+}
+
+.top {
+  padding:15px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+input {
+  padding:8px;
+  border:none;
+  border-radius:5px;
+}
+
+button {
+  padding:10px;
+  background:#22c55e;
+  border:none;
+  border-radius:5px;
+  color:#fff;
+  cursor:pointer;
+}
+
+.stats {
+  padding:15px;
+}
 </style>
+
 </head>
 <body>
 
 <h1>CRM</h1>
 
-<form id="form">
-<input placeholder="Товар" id="product" required>
-<input placeholder="Магазин" id="store">
-<input placeholder="Клієнт" id="client">
-<input placeholder="Телефон" id="phone">
-<input type="number" placeholder="Ціна" id="price">
-<input type="number" placeholder="Закупка" id="cost">
-<input type="number" placeholder="Реклама" id="ads">
+<div class="top">
+<input id="product" placeholder="Товар">
+<input id="price" type="number" placeholder="Ціна">
+<input id="cost" type="number" placeholder="Закупка">
+<input id="ads" type="number" placeholder="Реклама">
+<button onclick="addOrder()">Додати</button>
+</div>
 
-<select id="status">
-<option>Новий</option>
-<option>Відправлено</option>
-<option>Оплата</option>
-<option>Відмова</option>
-</select>
+<div class="container">
 
-<select id="paid">
-<option value="no">Не оплачено</option>
-<option value="yes">Оплачено</option>
-</select>
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="new">
+<h2>Нові</h2>
+</div>
 
-<input placeholder="Постачальник" id="supplier">
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="work">
+<h2>В роботі</h2>
+</div>
 
-<button>Додати</button>
-</form>
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="sent">
+<h2>Відправлено</h2>
+</div>
 
-<table>
-<thead>
-<tr>
-<th>Товар</th><th>Магазин</th><th>Клієнт</th><th>Ціна</th>
-<th>Закупка</th><th>Реклама</th><th>Прибуток</th>
-<th>Статус</th><th>Оплата</th>
-</tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="done">
+<h2>Завершено</h2>
+</div>
 
-<h2>Статистика</h2>
-<div id="stats"></div>
+</div>
+
+<div class="stats" id="stats"></div>
 
 <script>
-let data = JSON.parse(localStorage.getItem('crm') || '[]');
+let data = JSON.parse(localStorage.getItem('crm2') || '[]');
 
-const form = document.getElementById('form');
-const table = document.getElementById('table');
-const stats = document.getElementById('stats');
-
-function render() {
-table.innerHTML = '';
-let profit = 0, revenue = 0, ads = 0;
-
-data.forEach(d => {
-let p = d.price - d.cost - d.ads;
-profit += p;
-revenue += d.price;
-ads += d.ads;
-
-table.innerHTML += `
-<tr>
-<td>${d.product}</td>
-<td>${d.store}</td>
-<td>${d.client}</td>
-<td>${d.price}</td>
-<td>${d.cost}</td>
-<td>${d.ads}</td>
-<td>${p}</td>
-<td>${d.status}</td>
-<td>${d.paid}</td>
-</tr>`;
-});
-
-stats.innerHTML = `
-Оборот: ${revenue} грн<br>
-Прибуток: ${profit} грн<br>
-Реклама: ${ads} грн`;
+function save() {
+  localStorage.setItem('crm2', JSON.stringify(data));
 }
 
-form.onsubmit = e => {
-e.preventDefault();
+function render() {
+  document.querySelectorAll('.column').forEach(col => col.innerHTML = "<h2>"+col.querySelector("h2").innerText+"</h2>");
 
-let obj = {
-product: product.value,
-store: store.value,
-client: client.value,
-phone: phone.value,
-price: +price.value,
-cost: +cost.value,
-ads: +ads.value,
-status: status.value,
-paid: paid.value,
-supplier: supplier.value
-};
+  let profit=0, revenue=0, ads=0;
 
-data.push(obj);
-localStorage.setItem('crm', JSON.stringify(data));
-form.reset();
-render();
-};
+  data.forEach((d,i) => {
+    let p = d.price - d.cost - d.ads;
+    profit += p;
+    revenue += d.price;
+    ads += d.ads;
+
+    let card = document.createElement('div');
+    card.className = 'card';
+    card.draggable = true;
+    card.ondragstart = e => e.dataTransfer.setData("id", i);
+
+    card.innerHTML = `
+      <b>${d.product}</b>
+      <small>💰 ${d.price} | Прибуток: ${p}</small>
+    `;
+
+    document.querySelector(`[data-status=${d.status}]`).appendChild(card);
+  });
+
+  document.getElementById('stats').innerHTML = `
+  Оборот: ${revenue} грн<br>
+  Прибуток: ${profit} грн<br>
+  Реклама: ${ads} грн`;
+}
+
+function addOrder() {
+  let obj = {
+    product: product.value,
+    price:+price.value,
+    cost:+cost.value,
+    ads:+ads.value,
+    status:'new'
+  };
+
+  data.push(obj);
+  save();
+  render();
+}
+
+function allowDrop(e){e.preventDefault();}
+
+function drop(e){
+  e.preventDefault();
+  let id = e.dataTransfer.getData("id");
+  let status = e.currentTarget.dataset.status;
+  data[id].status = status;
+  save();
+  render();
+}
 
 render();
 </script>
