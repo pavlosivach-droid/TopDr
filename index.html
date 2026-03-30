@@ -5,1277 +5,1159 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TopDr CRM</title>
   <style>
-    :root{
-      --bg:#08111f;
-      --panel:#0f1b31;
-      --panel2:#13243f;
-      --line:rgba(255,255,255,.08);
-      --text:#e6eefc;
-      --muted:#93a4c3;
-      --brand:#6d7cff;
-      --brand2:#22c55e;
-      --danger:#ef4444;
-      --warn:#f59e0b;
-      --shadow: 0 18px 40px rgba(0,0,0,.32);
-      --radius:20px;
-      --radius2:14px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 600px at 20% 0%, rgba(109,124,255,.20), transparent 60%),
-        radial-gradient(800px 500px at 100% 0%, rgba(34,197,94,.10), transparent 55%),
-        linear-gradient(180deg, #07101d 0%, #07101d 20%, #050b14 100%);
-      color:var(--text);
-      overflow-x:hidden;
-    }
-    .app{
-      min-height:100vh;
-      display:grid;
-      grid-template-columns: 280px 1fr;
-    }
-    .sidebar{
-      background: linear-gradient(180deg, rgba(15,27,49,.98), rgba(10,18,34,.98));
-      border-right:1px solid var(--line);
-      padding:22px 18px;
-      position:sticky;
-      top:0;
-      height:100vh;
-      overflow:auto;
-    }
-    .brand{
-      display:flex;align-items:center;gap:12px;
-      padding:10px 12px 18px;
-      border-bottom:1px solid var(--line);
-      margin-bottom:18px;
-    }
-    .logo{
-      width:44px;height:44px;border-radius:14px;
-      background: linear-gradient(135deg, #6d7cff, #22c55e);
-      box-shadow: 0 10px 24px rgba(109,124,255,.35);
-      display:grid;place-items:center;font-weight:900;color:white;
-    }
-    .brand h1{font-size:18px;margin:0}
-    .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
-    .nav{
-      display:flex;flex-direction:column;gap:8px;
-      margin-top:14px;
-    }
-    .nav button{
-      appearance:none;border:none;cursor:pointer;
-      background:transparent;color:var(--text);
-      padding:14px 14px;border-radius:14px;
-      display:flex;align-items:center;gap:12px;
-      text-align:left;font-size:14px;
-      transition:.2s ease;
-    }
-    .nav button:hover{background:rgba(255,255,255,.05)}
-    .nav button.active{
-      background: linear-gradient(135deg, rgba(109,124,255,.20), rgba(34,197,94,.12));
-      box-shadow: inset 0 0 0 1px rgba(109,124,255,.25);
-    }
-    .nav .dot{
-      width:10px;height:10px;border-radius:50%;
-      background:var(--muted);flex:0 0 auto;
-    }
-    .nav button.active .dot{background:var(--brand)}
-    .sidebar-card{
-      margin-top:18px;
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-    }
-    .mini{
-      display:flex;justify-content:space-between;align-items:center;
-      gap:10px;
-      margin:8px 0;
-      color:var(--muted);
-      font-size:12px;
-    }
-    .badge{
-      display:inline-flex;align-items:center;gap:7px;
-      padding:8px 10px;border-radius:999px;
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      font-size:12px;
-      border:1px solid var(--line);
-      white-space:nowrap;
-    }
-    .badge.ok{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22)}
-    .badge.warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.22)}
-    .content{
-      padding:22px;
-      width:100%;
-      min-width:0;
-    }
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:16px;flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-    .title h2{margin:0;font-size:28px;letter-spacing:.2px}
-    .title p{margin:6px 0 0;color:var(--muted)}
-    .actions{
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-    }
-    .search, .date, .select, .input, textarea{
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      color:var(--text);
-      border-radius:14px;
-      padding:12px 14px;
-      outline:none;
-      transition:.2s;
-    }
-    .search{min-width:320px}
-    .search:focus,.date:focus,.select:focus,.input:focus,textarea:focus{
-      border-color:rgba(109,124,255,.55);
-      box-shadow:0 0 0 3px rgba(109,124,255,.10);
-    }
-    .btn{
-      appearance:none;border:none;cursor:pointer;
-      padding:12px 16px;border-radius:14px;
-      font-weight:700;color:white;
-      background: linear-gradient(135deg, #6d7cff, #4f6bff);
-      box-shadow: 0 10px 22px rgba(79,107,255,.22);
-      transition:transform .15s ease, opacity .15s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn.secondary{
-      background:rgba(255,255,255,.06);box-shadow:none;
-      border:1px solid var(--line);
-    }
-    .btn.green{background:linear-gradient(135deg,#22c55e,#0ea5e9)}
-    .btn.red{background:linear-gradient(135deg,#ef4444,#fb7185)}
-    .grid{
-      display:grid;
-      gap:14px;
-    }
-    .stats-grid{
-      grid-template-columns: repeat(6, minmax(0,1fr));
-      margin-bottom:14px;
-    }
-    .stat{
-      background:linear-gradient(180deg, rgba(19,36,63,.92), rgba(11,19,34,.92));
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:16px;
-      box-shadow:var(--shadow);
-      min-height:110px;
-    }
-    .stat .label{color:var(--muted);font-size:12px;letter-spacing:.2px}
-    .stat .value{margin-top:10px;font-size:28px;font-weight:900}
-    .stat .sub{margin-top:8px;color:var(--muted);font-size:12px}
-    .panel{
-      background:linear-gradient(180deg, rgba(15,27,49,.92), rgba(10,18,34,.92));
-      border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      padding:16px;
-      margin-top:14px;
-      min-width:0;
-    }
-    .panel-header{
-      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-    .panel-header h3{margin:0;font-size:18px}
-    .panel-header .muted{color:var(--muted);font-size:13px}
-    .filters{
-      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-    }
-    .filters .group{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .kanban{
-      display:grid;
-      grid-template-columns: repeat(5, minmax(260px,1fr));
-      gap:14px;
-    }
-    .col{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:20px;
-      min-height:580px;
-      padding:12px;
-    }
-    .col-head{
-      display:flex;justify-content:space-between;align-items:center;
-      margin-bottom:12px;
-    }
-    .col-title{display:flex;align-items:center;gap:10px;font-weight:800}
-    .count{
-      min-width:30px;height:30px;border-radius:999px;
-      display:grid;place-items:center;
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--line);
-      color:var(--text);
-      font-size:12px;
-    }
-    .drop-hint{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:12px;
-      border:1px dashed rgba(255,255,255,.12);
-      border-radius:14px;
-      padding:10px;
-      text-align:center;
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(25,42,73,.95), rgba(16,28,50,.98));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:18px;
-      padding:14px;
-      margin-bottom:12px;
-      cursor:grab;
-      position:relative;
-      box-shadow: 0 12px 24px rgba(0,0,0,.18);
-    }
-    .card:active{cursor:grabbing}
-    .card-top{
-      display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
-    }
-    .card h4{margin:0;font-size:15px;line-height:1.3}
-    .card .meta{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.4}
-    .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .tag{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:6px 8px;border-radius:999px;
-      font-size:11px;font-weight:700;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.07);
-      color:var(--text);
-    }
-    .tag.paid{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.22);color:#b8f8cc}
-    .tag.unpaid{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.22);color:#ffd0d0}
-    .tag.blue{background:rgba(109,124,255,.16);border-color:rgba(109,124,255,.22);color:#d9ddff}
-    .card-actions{
-      display:flex;gap:8px;flex-wrap:wrap;
-      margin-top:12px;
-    }
-    .icon-btn{
-      border:none;cursor:pointer;
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      border:1px solid var(--line);
-      padding:8px 10px;border-radius:12px;
-      font-size:12px;
-    }
-    .icon-btn.danger{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.20)}
-    .icon-btn.green{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.20)}
-    .order-table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0 10px;
-    }
-    .order-table th{
-      text-align:left;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:700;
-      padding:0 12px 8px 12px;
-      white-space:nowrap;
-    }
-    .order-table td{
-      background:rgba(255,255,255,.04);
-      padding:14px 12px;
-      border-top:1px solid rgba(255,255,255,.05);
-      border-bottom:1px solid rgba(255,255,255,.05);
-      font-size:13px;
-      vertical-align:top;
-    }
-    .order-table tr td:first-child{border-radius:16px 0 0 16px;border-left:1px solid rgba(255,255,255,.05)}
-    .order-table tr td:last-child{border-radius:0 16px 16px 0;border-right:1px solid rgba(255,255,255,.05)}
-    .muted{color:var(--muted)}
-    .two-col{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:14px;
-    }
-    .list-box{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      min-width:0;
-    }
-    .list-header{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px
-    }
-    .chips{
-      display:flex;flex-wrap:wrap;gap:8px;
-      margin-top:10px;
-    }
-    .chip{
-      display:inline-flex;align-items:center;gap:8px;
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:8px 10px;
-      font-size:12px;
-    }
-    .chip button{
-      border:none;background:transparent;color:#fb7185;cursor:pointer;font-size:14px;line-height:1
-    }
-    .form-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:10px;
-    }
-    .form-grid .full{grid-column:1 / -1}
-    .form-grid .span2{grid-column: span 2}
-    .field label{
-      display:block;
-      color:var(--muted);
-      font-size:12px;
-      margin:0 0 6px 2px;
-    }
-    .field input,.field select,.field textarea{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      color:var(--text);
-      outline:none;
-    }
-    .field textarea{min-height:92px;resize:vertical}
-    .form-actions{
-      display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;
-      margin-top:12px;
-    }
-    .hidden{display:none !important}
-    .footer-note{
-      color:var(--muted);
-      font-size:12px;
-      margin-top:8px;
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2d;
+      --panel-2: #18233a;
+      --panel-3: #1f2a44;
+      --line: rgba(255,255,255,0.08);
+      --text: #e5eefc;
+      --muted: #9fb0d0;
+      --accent: #4f8cff;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --chip: #24324f;
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --radius: 18px;
     }
 
-    @media (max-width: 1280px){
-      .app{grid-template-columns:1fr}
-      .sidebar{
-        position:relative;height:auto;
-        border-right:none;border-bottom:1px solid var(--line);
-      }
-      .stats-grid{grid-template-columns: repeat(3, minmax(0,1fr))}
-      .kanban{grid-template-columns: repeat(2, minmax(260px,1fr))}
-      .two-col{grid-template-columns:1fr}
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(79,140,255,.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 24%),
+        var(--bg);
+      color: var(--text);
     }
-    @media (max-width: 820px){
-      .content{padding:14px}
-      .search{min-width:100%}
-      .stats-grid{grid-template-columns: repeat(2, minmax(0,1fr))}
-      .kanban{grid-template-columns:1fr}
-      .form-grid{grid-template-columns:1fr}
-      .form-grid .span2{grid-column:auto}
-      .topbar{align-items:stretch}
-      .actions{width:100%}
-      .actions .btn,.actions .secondary,.actions .search,.actions .date{width:100%}
-      .order-table{display:block;overflow-x:auto;white-space:nowrap}
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Login */
+    .login-wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .login-card {
+      width: min(460px, 100%);
+      background: linear-gradient(180deg, rgba(24,35,58,.92), rgba(17,26,45,.95));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .brand {
+      display:flex; align-items:center; gap:12px; margin-bottom: 18px;
+    }
+    .brand-badge {
+      width: 46px; height: 46px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      display:grid; place-items:center; font-weight: 800;
+      box-shadow: 0 12px 30px rgba(79,140,255,.35);
+    }
+    .brand h1 { font-size: 22px; margin: 0; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+    .field {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom: 14px;
+    }
+    .field label { font-size: 13px; color: var(--muted); }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #0d1526;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    .field textarea { min-height: 92px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: rgba(79,140,255,.7);
+      box-shadow: 0 0 0 3px rgba(79,140,255,.12);
+    }
+
+    .btn-row { display:flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      border: none;
+      background: var(--panel-3);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .btn.primary { background: linear-gradient(135deg, var(--accent), #6a5cff); }
+    .btn.success { background: linear-gradient(135deg, var(--accent-2), #16a34a); }
+    .btn.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .btn.ghost { background: transparent; border: 1px solid var(--line); }
+
+    .login-note {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(79,140,255,.08);
+      border: 1px solid rgba(79,140,255,.18);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    /* App layout */
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, rgba(17,26,45,.97), rgba(13,21,38,.99));
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .sidebar .brand { margin-bottom: 22px; }
+    .nav {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .nav button {
+      text-align:left;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .nav button:hover { background: rgba(255,255,255,.04); }
+    .nav button.active {
+      background: linear-gradient(135deg, rgba(79,140,255,.18), rgba(79,140,255,.08));
+      border-color: rgba(79,140,255,.25);
+    }
+    .nav .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .main {
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .topbar {
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .title-box h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .title-box p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(24,35,58,.94), rgba(17,26,45,.96));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display:grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+      gap:10px;
+      padding: 14px;
+      margin-bottom: 16px;
+      align-items:end;
+    }
+    .toolbar .field { margin: 0; }
+    .toolbar .field input,
+    .toolbar .field select {
+      padding: 11px 12px;
+      border-radius: 12px;
+    }
+
+    .section {
+      display:none;
+    }
+    .section.active { display:block; }
+
+    .section-head {
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+    }
+    .section-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .section-head .muted { color: var(--muted); font-size: 13px; }
+
+    .filter-grid {
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr auto;
+      gap:10px;
+      margin-bottom: 12px;
+    }
+
+    .table-wrap {
+      overflow:auto;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(7,12,22,.18);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #10192b;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: .02em;
+      color: #c7d5f5;
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--line);
+      z-index: 1;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      vertical-align: top;
+      color: #e7eeff;
+      font-size: 13px;
+    }
+    tbody tr:hover { background: rgba(255,255,255,.03); }
+
+    .chip {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--chip);
+      color: #d9e5ff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .chip.ok { background: rgba(34,197,94,.15); color: #8df0ad; }
+    .chip.warn { background: rgba(245,158,11,.15); color: #ffd28b; }
+    .chip.bad { background: rgba(239,68,68,.15); color: #ffb1b1; }
+    .chip.info { background: rgba(79,140,255,.15); color: #a9c8ff; }
+
+    .inline-select {
+      background: #10192b;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .actions {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .cards-grid {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .kpi {
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(31,42,68,.95), rgba(18,27,45,.95));
+      border: 1px solid var(--line);
+    }
+    .kpi .label { color: var(--muted); font-size: 13px; }
+    .kpi .value { margin-top: 8px; font-size: 28px; font-weight: 800; }
+    .kpi .sub { margin-top: 6px; color: var(--muted); font-size: 12px; }
+
+    .analytics-grid {
+      display:grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    .analytics-box {
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(31,42,68,.95), rgba(18,27,45,.95));
+      border: 1px solid var(--line);
+    }
+    .analytics-box h4 { margin: 0 0 12px; }
+    .analytics-box .row {
+      display:flex; justify-content:space-between; gap: 16px;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06);
+      color: #e8efff;
+      font-size: 14px;
+    }
+    .analytics-box .row:last-child { border-bottom: none; }
+    .analytics-box .muted { color: var(--muted); }
+
+    .store-list, .supplier-list {
+      display:flex; flex-direction:column; gap:8px;
+      margin-top: 10px;
+    }
+    .list-item {
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .list-item small { color: var(--muted); }
+
+    .drawer {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .drawer .field { margin-bottom: 0; }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 1200px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+      .toolbar { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .analytics-grid, .cards-grid, .drawer { grid-template-columns: 1fr; }
+      .filter-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .main { padding: 12px; }
+      .toolbar, .filter-grid { grid-template-columns: 1fr; }
+      .title-box h2 { font-size: 22px; }
+      .topbar { align-items:flex-start; }
     }
   </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo">T</div>
-      <div>
-        <h1>TopDr CRM</h1>
-        <p>Sales board · dark mode</p>
+  <div id="loginScreen" class="login-wrap">
+    <div class="login-card">
+      <div class="brand">
+        <div class="brand-badge">T</div>
+        <div>
+          <h1>TopDr CRM</h1>
+          <p>Темна CRM для замовлень, аналітики та обліку</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Логін</label>
+        <input id="loginUser" autocomplete="username" placeholder="admin" />
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btnLogin">Увійти</button>
+        <button class="btn ghost" id="btnSeed">Створити тестовий доступ</button>
+      </div>
+      <div class="login-note">
+        Це локальний логін у браузері. Для справжньої багатокористувацької безпеки потрібен сервер і база. Тут доступ працює швидко, щоб уже користуватись CRM і потім підключити API.
+      </div>
+      <div class="footer-note">
+        Доступ за замовчуванням: <b>admin</b> / <b>1234</b> (якщо ти натиснеш “Створити тестовий доступ”).
       </div>
     </div>
-
-    <div class="nav">
-      <button class="active" data-tab="dashboard"><span class="dot"></span> Дашборд</button>
-      <button data-tab="orders"><span class="dot"></span> Замовлення</button>
-      <button data-tab="lists"><span class="dot"></span> Постачальники / Магазини</button>
-      <button data-tab="backup"><span class="dot"></span> Резервна копія</button>
-    </div>
-
-    <div class="sidebar-card">
-      <div class="mini"><span>Формат</span><span class="badge ok">GitHub Pages ready</span></div>
-      <div class="mini"><span>Збереження</span><span class="badge">localStorage</span></div>
-      <div class="mini"><span>Мобільний доступ</span><span class="badge warn">так</span></div>
-      <div class="mini"><span>API</span><span class="badge">готово під інтеграцію</span></div>
-      <div class="footer-note">Усі дані зберігаються в браузері. Потім можна підключити Prom API та базу.</div>
-    </div>
-  </aside>
-
-  <main class="content">
-    <div class="topbar">
-      <div class="title">
-        <h2>CRM для продажів</h2>
-        <p>Замовлення, воронка, прибуток, реклама, постачальники та статистика за період.</p>
-      </div>
-      <div class="actions">
-        <input class="search" id="search" placeholder="Пошук: товар, клієнт, магазин, телефон..." />
-        <input class="date" id="dateFrom" type="date" />
-        <input class="date" id="dateTo" type="date" />
-        <button class="btn secondary" id="clearFilters">Скинути</button>
-        <button class="btn" id="openAdd">+ Замовлення</button>
-      </div>
-    </div>
-
-    <section id="dashboard">
-      <div class="grid stats-grid">
-        <div class="stat"><div class="label">Оборот</div><div class="value" id="mRevenue">0 ₴</div><div class="sub">за вибраний період</div></div>
-        <div class="stat"><div class="label">Прибуток</div><div class="value" id="mProfit">0 ₴</div><div class="sub">дохід - закупка - реклама</div></div>
-        <div class="stat"><div class="label">Реклама</div><div class="value" id="mAds">0 ₴</div><div class="sub">витрати на трафік</div></div>
-        <div class="stat"><div class="label">Замовлення</div><div class="value" id="mOrders">0</div><div class="sub">усього у фільтрі</div></div>
-        <div class="stat"><div class="label">Оплачені</div><div class="value" id="mPaid">0</div><div class="sub">підтверджені оплати</div></div>
-        <div class="stat"><div class="label">Середній чек</div><div class="value" id="mAov">0 ₴</div><div class="sub">середня ціна замовлення</div></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <h3>Воронка замовлень</h3>
-            <div class="muted">Перетягуй картки між колонками або редагуй у картці.</div>
-          </div>
-          <div class="filters">
-            <div class="group">
-              <button class="btn secondary" data-range="today">Сьогодні</button>
-              <button class="btn secondary" data-range="7">7 днів</button>
-              <button class="btn secondary" data-range="30">30 днів</button>
-              <button class="btn secondary" data-range="month">Цей місяць</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="kanban" id="board"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <h3>Таблиця замовлень</h3>
-            <div class="muted">Повний список по фільтру.</div>
-          </div>
-          <div class="filters">
-            <span class="badge" id="filteredInfo">0 записів</span>
-          </div>
-        </div>
-        <div style="overflow:auto">
-          <table class="order-table">
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Товар</th>
-                <th>Магазин</th>
-                <th>Клієнт</th>
-                <th>Телефон</th>
-                <th>Ціна</th>
-                <th>Закупка</th>
-                <th>Реклама</th>
-                <th>Прибуток</th>
-                <th>Постачальник</th>
-                <th>Статус</th>
-                <th>Оплата</th>
-                <th>Дії</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section id="lists" class="hidden">
-      <div class="two-col">
-        <div class="list-box">
-          <div class="list-header">
-            <div>
-              <h3>Постачальники</h3>
-              <div class="muted">Введи назву один раз — далі вибирай зі списку.</div>
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="field full">
-              <label>Додати постачальника</label>
-              <input id="newSupplier" class="input" placeholder="Напр. Optima, Base, PromSupplier..." />
-            </div>
-            <div class="field full">
-              <button class="btn" id="addSupplierBtn" type="button">Додати постачальника</button>
-            </div>
-          </div>
-          <div class="chips" id="supplierChips"></div>
-        </div>
-
-        <div class="list-box">
-          <div class="list-header">
-            <div>
-              <h3>Магазини</h3>
-              <div class="muted">Тут зберігаються всі магазини, з яких приходять замовлення.</div>
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="field full">
-              <label>Додати магазин</label>
-              <input id="newStore" class="input" placeholder="Напр. TopDr, GardenPro..." />
-            </div>
-            <div class="field full">
-              <button class="btn" id="addStoreBtn" type="button">Додати магазин</button>
-            </div>
-          </div>
-          <div class="chips" id="storeChips"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="backup" class="hidden">
-      <div class="two-col">
-        <div class="list-box">
-          <div class="list-header">
-            <div>
-              <h3>Резервна копія</h3>
-              <div class="muted">Експорт/імпорт усіх даних CRM.</div>
-            </div>
-          </div>
-          <div class="form-actions" style="justify-content:flex-start">
-            <button class="btn green" id="exportBtn" type="button">Експорт JSON</button>
-            <label class="btn secondary" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
-              Імпорт JSON
-              <input id="importFile" type="file" accept="application/json" style="display:none">
-            </label>
-            <button class="btn red" id="resetBtn" type="button">Очистити все</button>
-          </div>
-          <p class="footer-note">Перед першою зміною краще зробити експорт. Потім можна зберігати бекапи на комп’ютер або Google Drive.</p>
-        </div>
-        <div class="list-box">
-          <div class="list-header">
-            <div>
-              <h3>Підготовка під API</h3>
-              <div class="muted">Уже є структура під майбутній пром-імпорт.</div>
-            </div>
-          </div>
-          <div class="badge ok">orders[] · suppliers[] · stores[]</div>
-          <p class="footer-note">Після підключення API просто замінюємо джерело даних, а інтерфейс лишається той самий.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-</div>
-
-<!-- Modal -->
-<div id="modal" class="hidden" style="position:fixed;inset:0;background:rgba(3,8,20,.72);backdrop-filter: blur(8px);z-index:50;padding:18px;overflow:auto;">
-  <div style="max-width:1080px;margin:4vh auto;background:linear-gradient(180deg, rgba(15,27,49,.98), rgba(10,18,34,.98));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:18px;">
-    <div class="panel-header">
-      <div>
-        <h3 id="modalTitle" style="margin:0">Додати замовлення</h3>
-        <div class="muted">Усі поля можна змінити після створення.</div>
-      </div>
-      <button class="btn secondary" id="closeModal" type="button">✕ Закрити</button>
-    </div>
-    <form id="orderForm">
-      <input type="hidden" id="orderId" />
-      <div class="form-grid">
-        <div class="field">
-          <label>Товар *</label>
-          <input id="product" required placeholder="Назва товару" />
-        </div>
-        <div class="field">
-          <label>Магазин *</label>
-          <input id="store" list="storesList" required placeholder="Назва магазину" />
-        </div>
-        <div class="field">
-          <label>Клієнт *</label>
-          <input id="client" required placeholder="Ім'я клієнта" />
-        </div>
-        <div class="field">
-          <label>Телефон *</label>
-          <input id="phone" required placeholder="+380..." />
-        </div>
-        <div class="field">
-          <label>Місто</label>
-          <input id="city" placeholder="Напр. Київ" />
-        </div>
-        <div class="field">
-          <label>Доставка</label>
-          <input id="delivery" placeholder="Нова Пошта / Укрпошта..." />
-        </div>
-        <div class="field">
-          <label>Ціна *</label>
-          <input id="price" type="number" min="0" step="0.01" required />
-        </div>
-        <div class="field">
-          <label>Закупка *</label>
-          <input id="cost" type="number" min="0" step="0.01" required />
-        </div>
-        <div class="field">
-          <label>Реклама *</label>
-          <input id="ads" type="number" min="0" step="0.01" required />
-        </div>
-        <div class="field">
-          <label>Рекламний канал</label>
-          <input id="adSource" placeholder="Prom, Meta, Google, OLX..." />
-        </div>
-        <div class="field">
-          <label>Постачальник</label>
-          <input id="supplier" list="suppliersList" placeholder="Обрати або вписати" />
-        </div>
-        <div class="field">
-          <label>Дата</label>
-          <input id="date" type="date" />
-        </div>
-        <div class="field">
-          <label>Статус</label>
-          <select id="status" class="select">
-            <option value="new">Новий</option>
-            <option value="processing">В обробці</option>
-            <option value="shipped">Відправлено</option>
-            <option value="done">Завершено</option>
-            <option value="cancelled">Відмова</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Оплата</label>
-          <select id="paid" class="select">
-            <option value="false">Не оплачено</option>
-            <option value="true">Оплачено</option>
-          </select>
-        </div>
-        <div class="field span2">
-          <label>Коментар</label>
-          <textarea id="notes" placeholder="Будь-яка примітка по замовленню..."></textarea>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn secondary" type="button" id="cancelEdit">Скасувати</button>
-        <button class="btn" type="submit" id="saveOrderBtn">Зберегти</button>
-      </div>
-    </form>
   </div>
-</div>
 
-<datalist id="suppliersList"></datalist>
-<datalist id="storesList"></datalist>
-
-<script>
-(() => {
-  const STORAGE_KEY = 'topdr_crm_v1';
-
-  const state = {
-    data: {
-      orders: [],
-      suppliers: ['Default Supplier'],
-      stores: ['TopDr'],
-    },
-    filters: {
-      search: '',
-      from: '',
-      to: '',
-    },
-    activeTab: 'dashboard',
-    editingId: null,
-  };
-
-  const els = {
-    board: document.getElementById('board'),
-    tableBody: document.getElementById('tableBody'),
-    filteredInfo: document.getElementById('filteredInfo'),
-    search: document.getElementById('search'),
-    from: document.getElementById('dateFrom'),
-    to: document.getElementById('dateTo'),
-    mRevenue: document.getElementById('mRevenue'),
-    mProfit: document.getElementById('mProfit'),
-    mAds: document.getElementById('mAds'),
-    mOrders: document.getElementById('mOrders'),
-    mPaid: document.getElementById('mPaid'),
-    mAov: document.getElementById('mAov'),
-    modal: document.getElementById('modal'),
-    modalTitle: document.getElementById('modalTitle'),
-    orderForm: document.getElementById('orderForm'),
-    openAdd: document.getElementById('openAdd'),
-    closeModal: document.getElementById('closeModal'),
-    cancelEdit: document.getElementById('cancelEdit'),
-    orderId: document.getElementById('orderId'),
-    product: document.getElementById('product'),
-    store: document.getElementById('store'),
-    client: document.getElementById('client'),
-    phone: document.getElementById('phone'),
-    city: document.getElementById('city'),
-    delivery: document.getElementById('delivery'),
-    price: document.getElementById('price'),
-    cost: document.getElementById('cost'),
-    ads: document.getElementById('ads'),
-    adSource: document.getElementById('adSource'),
-    supplier: document.getElementById('supplier'),
-    date: document.getElementById('date'),
-    status: document.getElementById('status'),
-    paid: document.getElementById('paid'),
-    notes: document.getElementById('notes'),
-    supplierChips: document.getElementById('supplierChips'),
-    storeChips: document.getElementById('storeChips'),
-    suppliersList: document.getElementById('suppliersList'),
-    storesList: document.getElementById('storesList'),
-    newSupplier: document.getElementById('newSupplier'),
-    newStore: document.getElementById('newStore'),
-    addSupplierBtn: document.getElementById('addSupplierBtn'),
-    addStoreBtn: document.getElementById('addStoreBtn'),
-    exportBtn: document.getElementById('exportBtn'),
-    importFile: document.getElementById('importFile'),
-    resetBtn: document.getElementById('resetBtn'),
-    clearFilters: document.getElementById('clearFilters'),
-  };
-
-  const statusMeta = {
-    new: { label: 'Новий', color: 'blue' },
-    processing: { label: 'В обробці', color: 'warn' },
-    shipped: { label: 'Відправлено', color: 'ok' },
-    done: { label: 'Завершено', color: 'ok' },
-    cancelled: { label: 'Відмова', color: 'danger' },
-  };
-
-  function todayISO() {
-    return new Date().toISOString().slice(0,10);
-  }
-
-  function monthStartISO() {
-    const d = new Date();
-    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10);
-  }
-
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-  }
-
-  function load() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        state.data.orders = Array.isArray(parsed.orders) ? parsed.orders : [];
-        state.data.suppliers = Array.isArray(parsed.suppliers) ? parsed.suppliers : [];
-        state.data.stores = Array.isArray(parsed.stores) ? parsed.stores : [];
-      } catch (e) {}
-    }
-
-    if (!state.data.suppliers.length) state.data.suppliers = ['Default Supplier'];
-    if (!state.data.stores.length) state.data.stores = ['TopDr'];
-  }
-
-  function money(value) {
-    const n = Number(value || 0);
-    return new Intl.NumberFormat('uk-UA', {maximumFractionDigits: 0}).format(Math.round(n)) + ' ₴';
-  }
-
-  function normalize(s) {
-    return (s || '').toString().trim().toLowerCase();
-  }
-
-  function orderProfit(o) {
-    return Number(o.price || 0) - Number(o.cost || 0) - Number(o.ads || 0);
-  }
-
-  function currentFiltered() {
-    const q = normalize(state.filters.search);
-    const from = state.filters.from;
-    const to = state.filters.to;
-
-    return state.data.orders.filter(o => {
-      const hay = [
-        o.product, o.store, o.client, o.phone, o.city, o.delivery,
-        o.adSource, o.supplier, o.notes, o.status, o.paid ? 'оплачено' : 'не оплачено'
-      ].join(' ').toLowerCase();
-
-      if (q && !hay.includes(q)) return false;
-      if (from && o.date && o.date < from) return false;
-      if (to && o.date && o.date > to) return false;
-      return true;
-    }).sort((a,b) => (b.date || '').localeCompare(a.date || '') || (Number(b.createdAt) - Number(a.createdAt)));
-  }
-
-  function statusFiltered(list, status) {
-    return list.filter(o => o.status === status);
-  }
-
-  function fillDatalists() {
-    els.suppliersList.innerHTML = state.data.suppliers
-      .filter(Boolean)
-      .map(s => `<option value="${escapeHtml(s)}"></option>`)
-      .join('');
-    els.storesList.innerHTML = state.data.stores
-      .filter(Boolean)
-      .map(s => `<option value="${escapeHtml(s)}"></option>`)
-      .join('');
-  }
-
-  function renderChips() {
-    const chipHTML = (items, kind) => items.map(item => `
-      <span class="chip">${escapeHtml(item)} <button title="Видалити" data-remove="${kind}:${encodeURIComponent(item)}">×</button></span>
-    `).join('');
-
-    els.supplierChips.innerHTML = chipHTML(state.data.suppliers, 'supplier');
-    els.storeChips.innerHTML = chipHTML(state.data.stores, 'store');
-
-    document.querySelectorAll('[data-remove]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const [kind, encoded] = btn.dataset.remove.split(':');
-        const value = decodeURIComponent(encoded);
-        if (kind === 'supplier') state.data.suppliers = state.data.suppliers.filter(v => v !== value);
-        if (kind === 'store') state.data.stores = state.data.stores.filter(v => v !== value);
-        save();
-        renderAll();
-      });
-    });
-  }
-
-  function renderStats(list) {
-    const revenue = list.reduce((sum, o) => sum + Number(o.price || 0), 0);
-    const ads = list.reduce((sum, o) => sum + Number(o.ads || 0), 0);
-    const profit = list.reduce((sum, o) => sum + orderProfit(o), 0);
-    const paid = list.filter(o => String(o.paid) === 'true').length;
-    const orders = list.length;
-    const aov = orders ? revenue / orders : 0;
-
-    els.mRevenue.textContent = money(revenue);
-    els.mProfit.textContent = money(profit);
-    els.mAds.textContent = money(ads);
-    els.mOrders.textContent = orders;
-    els.mPaid.textContent = paid;
-    els.mAov.textContent = money(aov);
-    els.filteredInfo.textContent = `${orders} записів`;
-  }
-
-  function renderBoard(list) {
-    const cols = ['new', 'processing', 'shipped', 'done', 'cancelled'];
-    els.board.innerHTML = cols.map(status => {
-      const items = statusFiltered(list, status);
-      return `
-        <div class="col" data-col="${status}">
-          <div class="col-head">
-            <div class="col-title">${statusMeta[status].label} <span class="count">${items.length}</span></div>
-          </div>
-          <div class="drop-hint">Перетягни картку сюди</div>
-          <div class="cards">
-            ${items.map(o => orderCardHTML(o)).join('')}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    document.querySelectorAll('.card').forEach(card => {
-      const id = card.dataset.id;
-      card.addEventListener('dragstart', ev => {
-        ev.dataTransfer.setData('text/plain', id);
-      });
-      card.querySelectorAll('[data-act]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const act = btn.dataset.act;
-          if (act === 'edit') openEdit(id);
-          if (act === 'del') deleteOrder(id);
-        });
-      });
-      const statusSelect = card.querySelector('select[data-status-select]');
-      statusSelect?.addEventListener('change', (e) => {
-        updateOrder(id, { status: e.target.value });
-      });
-      const paidSelect = card.querySelector('select[data-paid-select]');
-      paidSelect?.addEventListener('change', (e) => {
-        updateOrder(id, { paid: e.target.value === 'true' });
-      });
-    });
-
-    document.querySelectorAll('.col').forEach(col => {
-      col.addEventListener('dragover', e => e.preventDefault());
-      col.addEventListener('drop', e => {
-        e.preventDefault();
-        const id = e.dataTransfer.getData('text/plain');
-        const status = col.dataset.col;
-        updateOrder(id, { status });
-      });
-    });
-  }
-
-  function orderCardHTML(o) {
-    const profit = orderProfit(o);
-    const paid = String(o.paid) === 'true';
-    const stat = statusMeta[o.status] || statusMeta.new;
-    return `
-      <div class="card" draggable="true" data-id="${o.id}">
-        <div class="card-top">
-          <div style="min-width:0">
-            <h4>${escapeHtml(o.product || 'Без назви')}</h4>
-            <div class="meta">
-              ${escapeHtml(o.client || '-')}${o.phone ? ' · ' + escapeHtml(o.phone) : ''}<br>
-              ${escapeHtml(o.store || '-')}${o.supplier ? ' · ' + escapeHtml(o.supplier) : ''}
-            </div>
-          </div>
-          <span class="tag ${stat.color}">${stat.label}</span>
-        </div>
-        <div class="tag-row">
-          <span class="tag blue">Ціна: ${money(o.price)}</span>
-          <span class="tag">Прибуток: ${money(profit)}</span>
-          <span class="tag ${paid ? 'paid' : 'unpaid'}">${paid ? 'Оплачено' : 'Не оплачено'}</span>
-        </div>
-        <div class="meta" style="margin-top:10px">
-          ${o.city ? escapeHtml(o.city) + ' · ' : ''}${o.delivery ? escapeHtml(o.delivery) + ' · ' : ''}${escapeHtml(o.date || '')}
-        </div>
-        <div class="card-actions">
-          <button class="icon-btn green" data-act="edit">Редагувати</button>
-          <button class="icon-btn danger" data-act="del">Видалити</button>
-        </div>
-        <div class="card-actions">
-          <select data-status-select class="select" style="flex:1;min-width:0">
-            ${Object.entries(statusMeta).map(([k,v]) => `<option value="${k}" ${k===o.status?'selected':''}>${v.label}</option>`).join('')}
-          </select>
-          <select data-paid-select class="select" style="width:140px">
-            <option value="false" ${String(o.paid) === 'false' ? 'selected' : ''}>Не оплачено</option>
-            <option value="true" ${String(o.paid) === 'true' ? 'selected' : ''}>Оплачено</option>
-          </select>
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">T</div>
+        <div>
+          <h1>TopDr CRM</h1>
+          <p id="userGreeting">Вітаю!</p>
         </div>
       </div>
-    `;
-  }
+      <div class="nav">
+        <button data-tab="orders" class="active">Замовлення <span class="hint">список</span></button>
+        <button data-tab="analytics">Аналітика <span class="hint">прибуток / реклама</span></button>
+        <button data-tab="stores">Магазини <span class="hint">список</span></button>
+        <button data-tab="suppliers">Постачальники <span class="hint">список</span></button>
+        <button data-tab="settings">Налаштування <span class="hint">логін / резерв</span></button>
+      </div>
+      <div style="margin-top:18px;">
+        <button class="btn danger" id="logoutBtn" style="width:100%;">Вийти</button>
+      </div>
+    </aside>
 
-  function renderTable(list) {
-    els.tableBody.innerHTML = list.map(o => {
-      const profit = orderProfit(o);
-      const stat = statusMeta[o.status] || statusMeta.new;
-      return `
-        <tr>
-          <td>${escapeHtml(o.date || '')}</td>
-          <td>${escapeHtml(o.product || '')}</td>
-          <td>${escapeHtml(o.store || '')}</td>
-          <td>${escapeHtml(o.client || '')}</td>
-          <td>${escapeHtml(o.phone || '')}</td>
-          <td>${money(o.price)}</td>
-          <td>${money(o.cost)}</td>
-          <td>${money(o.ads)}</td>
-          <td>${money(profit)}</td>
-          <td>${escapeHtml(o.supplier || '')}</td>
-          <td>${stat.label}</td>
-          <td>${String(o.paid) === 'true' ? 'Оплачено' : 'Не оплачено'}</td>
-          <td>
-            <div class="card-actions" style="margin:0">
-              <button class="icon-btn green" data-act="edit" data-id="${o.id}">Ред.</button>
-              <button class="icon-btn danger" data-act="del" data-id="${o.id}">×</button>
+    <main class="main">
+      <div class="topbar">
+        <div class="title-box">
+          <h2 id="pageTitle">Замовлення</h2>
+          <p id="pageSubtitle">Список замовлень як у сучасній CRM. Дані зберігаються локально і можуть бути експортовані в Excel.</p>
+        </div>
+        <div class="btn-row" id="topActions">
+          <button class="btn ghost" id="exportBtn">Резервна копія Excel</button>
+          <button class="btn ghost" id="importBtn">Імпорт JSON</button>
+          <button class="btn success" id="openAddBtn">+ Додати замовлення</button>
+        </div>
+      </div>
+
+      <section id="ordersSection" class="section active">
+        <div class="panel" id="ordersPanel">
+          <div id="orderFormArea" class="toolbar">
+            <div class="field"><input id="fProduct" placeholder="Назва товару"></div>
+            <div class="field"><input id="fStore" list="storesDatalist" placeholder="Назва магазину"></div>
+            <div class="field"><input id="fClient" placeholder="Клієнт"></div>
+            <div class="field"><input id="fPhone" placeholder="Телефон"></div>
+            <div class="field"><input id="fPrice" type="number" step="0.01" placeholder="Ціна, грн"></div>
+            <div class="field"><input id="fCost" type="number" step="0.01" placeholder="Закупка, грн"></div>
+            <div class="field"><input id="fAds" type="number" step="0.01" placeholder="Реклама, грн"></div>
+            <div class="field"><input id="fSupplier" list="suppliersDatalist" placeholder="Постачальник"></div>
+            <div class="field"><select id="fStatus"><option value="new">Новий</option><option value="work">В роботі</option><option value="sent">Відправлено</option><option value="done">Завершено</option><option value="cancel">Скасовано</option></select></div>
+            <div class="field"><select id="fPaid"><option value="no">Не оплачено</option><option value="yes">Оплачено</option></select></div>
+            <div class="field"><input id="fDate" type="date"></div>
+            <div class="field"><input id="fNotes" placeholder="Коментар"></div>
+            <div class="btn-row" style="grid-column: 1 / -1; justify-content:flex-end;">
+              <button class="btn ghost" id="resetOrderBtn" type="button">Скинути</button>
+              <button class="btn success" id="addOrderBtn" type="button">Додати замовлення</button>
             </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
+          </div>
 
-    document.querySelectorAll('#tableBody [data-act]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
-        if (btn.dataset.act === 'edit') openEdit(id);
-        if (btn.dataset.act === 'del') deleteOrder(id);
-      });
-    });
-  }
+          <div class="section-head" style="padding:0 14px 14px;">
+            <div>
+              <h3>Список замовлень</h3>
+              <div class="muted">Фільтруй по магазину, постачальнику, статусу та періоду.</div>
+            </div>
+          </div>
 
-  function renderAll() {
-    fillDatalists();
-    renderChips();
-    const list = currentFiltered();
-    renderStats(list);
-    renderBoard(list);
-    renderTable(list);
-    attachColDropHints();
-  }
+          <div style="padding:0 14px 14px;">
+            <div class="filter-grid">
+              <div class="field"><input id="searchOrder" placeholder="Пошук товару / клієнта / телефону"></div>
+              <div class="field"><select id="filterStore"><option value="all">Всі магазини</option></select></div>
+              <div class="field"><select id="filterSupplier"><option value="all">Всі постачальники</option></select></div>
+              <div class="field"><select id="filterStatus"><option value="all">Всі статуси</option><option value="new">Новий</option><option value="work">В роботі</option><option value="sent">Відправлено</option><option value="done">Завершено</option><option value="cancel">Скасовано</option></select></div>
+              <div class="field"><input id="filterFrom" type="date"></div>
+              <div class="field"><input id="filterTo" type="date"></div>
+            </div>
+          </div>
 
-  function attachColDropHints() {
-    document.querySelectorAll('.col').forEach(col => {
-      col.addEventListener('dragover', (e) => e.preventDefault());
-      col.addEventListener('drop', handleDrop);
-    });
-  }
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Товар</th>
+                  <th>Магазин</th>
+                  <th>Клієнт</th>
+                  <th>Телефон</th>
+                  <th>Постачальник</th>
+                  <th>Ціна</th>
+                  <th>Закупка</th>
+                  <th>Реклама</th>
+                  <th>Прибуток</th>
+                  <th>Статус</th>
+                  <th>Оплата</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-  function handleDrop(e) {
-    e.preventDefault();
-    const id = e.dataTransfer.getData('text/plain');
-    const status = e.currentTarget.dataset.col;
-    updateOrder(id, {status});
-  }
+      <section id="analyticsSection" class="section">
+        <div class="section-head">
+          <div>
+            <h3>Аналітика</h3>
+            <div class="muted">Точно до копійки. Фільтр працює по магазинах, постачальниках і періоду.</div>
+          </div>
+        </div>
 
-  function openModal(mode = 'add') {
-    els.modal.classList.remove('hidden');
-    els.modalTitle.textContent = mode === 'edit' ? 'Редагувати замовлення' : 'Додати замовлення';
-  }
+        <div class="panel" style="padding:14px; margin-bottom:14px;">
+          <div class="filter-grid" style="margin-bottom:0;">
+            <div class="field"><select id="anStore"><option value="all">Всі магазини</option></select></div>
+            <div class="field"><select id="anSupplier"><option value="all">Всі постачальники</option></select></div>
+            <div class="field"><select id="anStatus"><option value="all">Всі статуси</option><option value="new">Новий</option><option value="work">В роботі</option><option value="sent">Відправлено</option><option value="done">Завершено</option><option value="cancel">Скасовано</option></select></div>
+            <div class="field"><input id="anFrom" type="date"></div>
+            <div class="field"><input id="anTo" type="date"></div>
+            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
+              <button class="btn ghost" id="anReset">Скинути фільтри</button>
+            </div>
+          </div>
+        </div>
 
-  function closeModal() {
-    els.modal.classList.add('hidden');
-    state.editingId = null;
-    els.orderForm.reset();
-    els.orderId.value = '';
-    els.date.value = todayISO();
-    els.status.value = 'new';
-    els.paid.value = 'false';
-  }
+        <div class="cards-grid" style="margin-bottom:14px;">
+          <div class="kpi"><div class="label">Оборот</div><div class="value" id="kpiTurnover">₴0.00</div><div class="sub">Сума всіх замовлень</div></div>
+          <div class="kpi"><div class="label">Прибуток</div><div class="value" id="kpiProfit">₴0.00</div><div class="sub">Після закупки та реклами</div></div>
+          <div class="kpi"><div class="label">Реклама</div><div class="value" id="kpiAds">₴0.00</div><div class="sub">Усі рекламні витрати</div></div>
+          <div class="kpi"><div class="label">Замовлення</div><div class="value" id="kpiCount">0</div><div class="sub">Кількість по фільтру</div></div>
+        </div>
 
-  function openAddForm(prefill = {}) {
-    state.editingId = null;
-    els.orderId.value = '';
-    els.product.value = prefill.product || '';
-    els.store.value = prefill.store || '';
-    els.client.value = prefill.client || '';
-    els.phone.value = prefill.phone || '';
-    els.city.value = prefill.city || '';
-    els.delivery.value = prefill.delivery || '';
-    els.price.value = prefill.price ?? '';
-    els.cost.value = prefill.cost ?? '';
-    els.ads.value = prefill.ads ?? 0;
-    els.adSource.value = prefill.adSource || '';
-    els.supplier.value = prefill.supplier || '';
-    els.date.value = prefill.date || todayISO();
-    els.status.value = prefill.status || 'new';
-    els.paid.value = String(prefill.paid ?? false);
-    els.notes.value = prefill.notes || '';
-    openModal('add');
-  }
+        <div class="analytics-grid">
+          <div class="analytics-box">
+            <h4>Підсумок</h4>
+            <div class="row"><span class="muted">Оборот</span><b id="sumTurnover">₴0.00</b></div>
+            <div class="row"><span class="muted">Закупка</span><b id="sumCost">₴0.00</b></div>
+            <div class="row"><span class="muted">Реклама</span><b id="sumAds">₴0.00</b></div>
+            <div class="row"><span class="muted">Прибуток</span><b id="sumProfit">₴0.00</b></div>
+            <div class="row"><span class="muted">Оплачені</span><b id="sumPaid">0</b></div>
+            <div class="row"><span class="muted">Неоплачені</span><b id="sumUnpaid">0</b></div>
+          </div>
+          <div class="analytics-box">
+            <h4>Коротка статистика</h4>
+            <div class="row"><span class="muted">Середній чек</span><b id="avgCheck">₴0.00</b></div>
+            <div class="row"><span class="muted">Середній прибуток</span><b id="avgProfit">₴0.00</b></div>
+            <div class="row"><span class="muted">Маржинальність</span><b id="marginPct">0%</b></div>
+            <div class="row"><span class="muted">Кількість магазинів</span><b id="storeCount">0</b></div>
+            <div class="row"><span class="muted">Кількість постачальників</span><b id="supplierCount">0</b></div>
+          </div>
+        </div>
+      </section>
 
-  function openEdit(id) {
-    const o = state.data.orders.find(x => x.id === id);
-    if (!o) return;
-    state.editingId = id;
-    els.orderId.value = id;
-    els.product.value = o.product || '';
-    els.store.value = o.store || '';
-    els.client.value = o.client || '';
-    els.phone.value = o.phone || '';
-    els.city.value = o.city || '';
-    els.delivery.value = o.delivery || '';
-    els.price.value = o.price ?? 0;
-    els.cost.value = o.cost ?? 0;
-    els.ads.value = o.ads ?? 0;
-    els.adSource.value = o.adSource || '';
-    els.supplier.value = o.supplier || '';
-    els.date.value = o.date || todayISO();
-    els.status.value = o.status || 'new';
-    els.paid.value = String(o.paid ?? false);
-    els.notes.value = o.notes || '';
-    openModal('edit');
-  }
+      <section id="storesSection" class="section">
+        <div class="section-head">
+          <div>
+            <h3>Магазини</h3>
+            <div class="muted">Список магазинів, який використовується у фільтрах і замовленнях.</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:14px;">
+          <div class="drawer" style="margin-bottom:12px;">
+            <div class="field"><input id="newStoreName" placeholder="Назва магазину"></div>
+            <div class="field"><input id="newStoreNote" placeholder="Примітка"></div>
+            <div class="field"><input id="newStoreTag" placeholder="Тег / код"></div>
+            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
+              <button class="btn success" id="addStoreBtn">Додати магазин</button>
+            </div>
+          </div>
+          <div id="storesList" class="store-list"></div>
+        </div>
+      </section>
 
-  function buildOrderFromForm() {
-    const supplier = els.supplier.value.trim();
-    const store = els.store.value.trim();
-    const order = {
-      id: state.editingId || uid(),
-      product: els.product.value.trim(),
-      store,
-      client: els.client.value.trim(),
-      phone: els.phone.value.trim(),
-      city: els.city.value.trim(),
-      delivery: els.delivery.value.trim(),
-      price: Number(els.price.value || 0),
-      cost: Number(els.cost.value || 0),
-      ads: Number(els.ads.value || 0),
-      adSource: els.adSource.value.trim(),
-      supplier,
-      date: els.date.value || todayISO(),
-      status: els.status.value,
-      paid: els.paid.value === 'true',
-      notes: els.notes.value.trim(),
-      createdAt: Date.now(),
+      <section id="suppliersSection" class="section">
+        <div class="section-head">
+          <div>
+            <h3>Постачальники</h3>
+            <div class="muted">Постачальники зберігаються як список і доступні в замовленнях.</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:14px;">
+          <div class="drawer" style="margin-bottom:12px;">
+            <div class="field"><input id="newSupplierName" placeholder="Назва постачальника"></div>
+            <div class="field"><input id="newSupplierNote" placeholder="Коментар"></div>
+            <div class="field"><input id="newSupplierTag" placeholder="Тег / код"></div>
+            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
+              <button class="btn success" id="addSupplierBtn">Додати постачальника</button>
+            </div>
+          </div>
+          <div id="suppliersList" class="supplier-list"></div>
+        </div>
+      </section>
+
+      <section id="settingsSection" class="section">
+        <div class="section-head">
+          <div>
+            <h3>Налаштування</h3>
+            <div class="muted">Логін, зміна пароля, резервні копії та очищення бази.</div>
+          </div>
+        </div>
+        <div class="panel" style="padding:14px;">
+          <div class="drawer" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom:12px;">
+            <div class="field"><input id="setLogin" placeholder="Новий логін"></div>
+            <div class="field"><input id="setPass" type="password" placeholder="Новий пароль"></div>
+            <div class="btn-row" style="align-self:end; justify-content:flex-end;">
+              <button class="btn success" id="saveCredsBtn">Зберегти логін / пароль</button>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn ghost" id="exportJsonBtn">Експорт JSON</button>
+            <button class="btn ghost" id="exportExcelBtn2">Резервна копія Excel</button>
+            <button class="btn danger" id="clearBtn">Очистити всі дані</button>
+          </div>
+          <div class="footer-note">
+            Резервна копія Excel створюється у форматі .xlsx через SheetJS з точною сумою у копійках (зберігається як числа, без втрат).
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <datalist id="storesDatalist"></datalist>
+  <datalist id="suppliersDatalist"></datalist>
+
+  <input id="importFile" type="file" accept="application/json" class="hidden" />
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const STORAGE_KEYS = {
+      user: 'td_user_v2',
+      orders: 'td_orders_v2',
+      stores: 'td_stores_v2',
+      suppliers: 'td_suppliers_v2',
+      session: 'td_session_v2'
     };
 
-    if (supplier && !state.data.suppliers.includes(supplier)) state.data.suppliers.unshift(supplier);
-    if (store && !state.data.stores.includes(store)) state.data.stores.unshift(store);
-    return order;
-  }
+    const STATUS_LABELS = {
+      new: 'Новий',
+      work: 'В роботі',
+      sent: 'Відправлено',
+      done: 'Завершено',
+      cancel: 'Скасовано'
+    };
 
-  function saveOrder(order) {
-    const idx = state.data.orders.findIndex(x => x.id === order.id);
-    if (idx >= 0) state.data.orders[idx] = { ...state.data.orders[idx], ...order };
-    else state.data.orders.unshift(order);
-    save();
-    renderAll();
-  }
+    const STATUS_CLASS = {
+      new: 'info',
+      work: 'warn',
+      sent: 'info',
+      done: 'ok',
+      cancel: 'bad'
+    };
 
-  function updateOrder(id, patch) {
-    const idx = state.data.orders.findIndex(x => x.id === id);
-    if (idx < 0) return;
-    state.data.orders[idx] = { ...state.data.orders[idx], ...patch };
-    save();
-    renderAll();
-  }
+    const state = {
+      orders: [],
+      stores: [],
+      suppliers: [],
+      user: null,
+      filters: {
+        search: '',
+        store: 'all',
+        supplier: 'all',
+        status: 'all',
+        from: '',
+        to: ''
+      },
+      analyticsFilters: {
+        store: 'all',
+        supplier: 'all',
+        status: 'all',
+        from: '',
+        to: ''
+      },
+      tab: 'orders'
+    };
 
-  function deleteOrder(id) {
-    if (!confirm('Видалити замовлення?')) return;
-    state.data.orders = state.data.orders.filter(x => x.id !== id);
-    save();
-    renderAll();
-  }
+    const el = (id) => document.getElementById(id);
+    const money = (kop) => new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((kop || 0) / 100);
+    const num = (v) => {
+      const n = Number(String(v).replace(',', '.'));
+      return Number.isFinite(n) ? Math.round(n * 100) : 0;
+    };
+    const safe = (s) => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const uid = () => Math.random().toString(36).slice(2, 11);
 
-  function addSimpleListItem(kind, value) {
-    const v = value.trim();
-    if (!v) return;
-    const key = kind === 'supplier' ? 'suppliers' : 'stores';
-    if (!state.data[key].includes(v)) {
-      state.data[key].unshift(v);
-      save();
+    function loadData() {
+      state.user = JSON.parse(localStorage.getItem(STORAGE_KEYS.user) || 'null');
+      state.orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.orders) || '[]');
+      state.stores = JSON.parse(localStorage.getItem(STORAGE_KEYS.stores) || '[]');
+      state.suppliers = JSON.parse(localStorage.getItem(STORAGE_KEYS.suppliers) || '[]');
+      const session = JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || 'null');
+      return session;
+    }
+
+    function saveAll() {
+      localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(state.orders));
+      localStorage.setItem(STORAGE_KEYS.stores, JSON.stringify(state.stores));
+      localStorage.setItem(STORAGE_KEYS.suppliers, JSON.stringify(state.suppliers));
+      localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(state.user));
+    }
+
+    function ensureSeedUser() {
+      if (!state.user) {
+        state.user = { username: 'admin', password: '1234' };
+        localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(state.user));
+      }
+    }
+
+    function login(username, password) {
+      ensureSeedUser();
+      return state.user.username === username && state.user.password === password;
+    }
+
+    function setSession(on) {
+      if (on) localStorage.setItem(STORAGE_KEYS.session, JSON.stringify({ ok: true }));
+      else localStorage.removeItem(STORAGE_KEYS.session);
+    }
+
+    function isLogged() {
+      return !!JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || 'null');
+    }
+
+    function showApp() {
+      el('loginScreen').classList.add('hidden');
+      el('app').classList.remove('hidden');
+      el('userGreeting').textContent = `Логін: ${state.user?.username || 'admin'}`;
+    }
+
+    function showLogin() {
+      el('app').classList.add('hidden');
+      el('loginScreen').classList.remove('hidden');
+    }
+
+    function initDefaults() {
+      ensureSeedUser();
+      if (!state.stores.length) {
+        state.stores = [
+          { id: uid(), name: 'Основний магазин', note: 'За замовчуванням', tag: 'main' }
+        ];
+      }
+      if (!state.suppliers.length) {
+        state.suppliers = [
+          { id: uid(), name: 'Постачальник 1', note: 'За замовчуванням', tag: 's1' }
+        ];
+      }
+      saveAll();
+    }
+
+    function setTab(tab) {
+      state.tab = tab;
+      document.querySelectorAll('.nav button[data-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      el(tab + 'Section').classList.add('active');
+
+      const titles = {
+        orders: ['Замовлення', 'Список замовлень як у сучасної CRM. Верхній блок тільки тут.'],
+        analytics: ['Аналітика', 'Підрахунки по фільтрах, за датами та по магазинах / постачальниках.'],
+        stores: ['Магазини', 'Список магазинів для вибору в замовленнях та аналітиці.'],
+        suppliers: ['Постачальники', 'Список постачальників для вибору в замовленнях та аналітиці.'],
+        settings: ['Налаштування', 'Логін, пароль, резервні копії та очищення бази.']
+      };
+      el('pageTitle').textContent = titles[tab][0];
+      el('pageSubtitle').textContent = titles[tab][1];
+      el('topActions').classList.toggle('hidden', tab !== 'orders');
+      el('orderFormArea').classList.toggle('hidden', tab !== 'orders');
+    }
+
+    function orderMatches(order, filters) {
+      const q = (filters.search || '').trim().toLowerCase();
+      const d = order.date || '';
+      const inFrom = !filters.from || d >= filters.from;
+      const inTo = !filters.to || d <= filters.to;
+      const inStore = filters.store === 'all' || order.store === filters.store;
+      const inSup = filters.supplier === 'all' || order.supplier === filters.supplier;
+      const inStatus = filters.status === 'all' || order.status === filters.status;
+      const qMatch = !q || [order.product, order.client, order.phone, order.store, order.supplier, order.notes].join(' ').toLowerCase().includes(q);
+      return inFrom && inTo && inStore && inSup && inStatus && qMatch;
+    }
+
+    function filteredOrders(filters) {
+      return state.orders.filter(o => orderMatches(o, filters));
+    }
+
+    function calcSummary(rows) {
+      return rows.reduce((acc, o) => {
+        const price = o.priceKop || 0;
+        const cost = o.costKop || 0;
+        const ads = o.adsKop || 0;
+        acc.turnover += price;
+        acc.cost += cost;
+        acc.ads += ads;
+        acc.profit += price - cost - ads;
+        acc.paid += o.paid === 'yes' ? 1 : 0;
+        acc.unpaid += o.paid !== 'yes' ? 1 : 0;
+        acc.count += 1;
+        return acc;
+      }, { turnover: 0, cost: 0, ads: 0, profit: 0, paid: 0, unpaid: 0, count: 0 });
+    }
+
+    function renderDatalists() {
+      const storesHtml = state.stores.map(s => `<option value="${safe(s.name)}"></option>`).join('');
+      const supHtml = state.suppliers.map(s => `<option value="${safe(s.name)}"></option>`).join('');
+      el('storesDatalist').innerHTML = storesHtml;
+      el('suppliersDatalist').innerHTML = supHtml;
+
+      const selectOptions = (items, selectedAllLabel) => `<option value="all">${selectedAllLabel}</option>` + items.map(x => `<option value="${safe(x.name)}">${safe(x.name)}</option>`).join('');
+      el('filterStore').innerHTML = selectOptions(state.stores, 'Всі магазини');
+      el('filterSupplier').innerHTML = selectOptions(state.suppliers, 'Всі постачальники');
+      el('anStore').innerHTML = selectOptions(state.stores, 'Всі магазини');
+      el('anSupplier').innerHTML = selectOptions(state.suppliers, 'Всі постачальники');
+    }
+
+    function renderOrders() {
+      const tbody = el('ordersBody');
+      const rows = filteredOrders(state.filters).sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+      tbody.innerHTML = rows.map(order => {
+        const profitKop = (order.priceKop || 0) - (order.costKop || 0) - (order.adsKop || 0);
+        return `
+          <tr>
+            <td>${safe(order.date || '')}</td>
+            <td><b>${safe(order.product)}</b><div class="muted">${safe(order.notes || '')}</div></td>
+            <td>${safe(order.store || '')}</td>
+            <td>${safe(order.client || '')}</td>
+            <td>${safe(order.phone || '')}</td>
+            <td>${safe(order.supplier || '')}</td>
+            <td>${money(order.priceKop)}</td>
+            <td>${money(order.costKop)}</td>
+            <td>${money(order.adsKop)}</td>
+            <td><b>${money(profitKop)}</b></td>
+            <td>
+              <select class="inline-select" data-act="status" data-id="${order.id}">
+                ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${order.status===k?'selected':''}>${v}</option>`).join('')}
+              </select>
+            </td>
+            <td>
+              <span class="chip ${order.paid === 'yes' ? 'ok' : 'warn'}">${order.paid === 'yes' ? 'Оплачено' : 'Не оплачено'}</span>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn ghost" data-act="pay" data-id="${order.id}">${order.paid === 'yes' ? 'Зняти оплату' : 'Оплатити'}</button>
+                <button class="btn danger" data-act="delete" data-id="${order.id}">Видалити</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateAnalytics() {
+      const rows = filteredOrders(state.analyticsFilters);
+      const s = calcSummary(rows);
+      el('kpiTurnover').textContent = money(s.turnover);
+      el('kpiProfit').textContent = money(s.profit);
+      el('kpiAds').textContent = money(s.ads);
+      el('kpiCount').textContent = s.count;
+      el('sumTurnover').textContent = money(s.turnover);
+      el('sumCost').textContent = money(s.cost);
+      el('sumAds').textContent = money(s.ads);
+      el('sumProfit').textContent = money(s.profit);
+      el('sumPaid').textContent = s.paid;
+      el('sumUnpaid').textContent = s.unpaid;
+      el('avgCheck').textContent = s.count ? money(Math.round(s.turnover / s.count)) : money(0);
+      el('avgProfit').textContent = s.count ? money(Math.round(s.profit / s.count)) : money(0);
+      const margin = s.turnover > 0 ? ((s.profit / s.turnover) * 100) : 0;
+      el('marginPct').textContent = `${margin.toFixed(1)}%`;
+      el('storeCount').textContent = state.stores.length;
+      el('supplierCount').textContent = state.suppliers.length;
+    }
+
+    function renderLists() {
+      el('storesList').innerHTML = state.stores.map(s => `
+        <div class="list-item">
+          <div>
+            <b>${safe(s.name)}</b><br>
+            <small>${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</small>
+          </div>
+          <button class="btn danger" data-remove-store="${s.id}">Видалити</button>
+        </div>
+      `).join('') || '<div class="muted">Ще немає магазинів.</div>';
+
+      el('suppliersList').innerHTML = state.suppliers.map(s => `
+        <div class="list-item">
+          <div>
+            <b>${safe(s.name)}</b><br>
+            <small>${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</small>
+          </div>
+          <button class="btn danger" data-remove-supplier="${s.id}">Видалити</button>
+        </div>
+      `).join('') || '<div class="muted">Ще немає постачальників.</div>';
+    }
+
+    function renderAll() {
+      renderDatalists();
+      renderOrders();
+      renderLists();
+      updateAnalytics();
+    }
+
+    function resetOrderForm() {
+      ['fProduct','fStore','fClient','fPhone','fPrice','fCost','fAds','fSupplier','fNotes'].forEach(id => el(id).value = '');
+      el('fStatus').value = 'new';
+      el('fPaid').value = 'no';
+      el('fDate').value = new Date().toISOString().slice(0,10);
+    }
+
+    function addOrder() {
+      const product = el('fProduct').value.trim();
+      if (!product) return alert('Вкажи назву товару');
+      const order = {
+        id: uid(),
+        date: el('fDate').value || new Date().toISOString().slice(0,10),
+        product,
+        store: el('fStore').value.trim(),
+        client: el('fClient').value.trim(),
+        phone: el('fPhone').value.trim(),
+        supplier: el('fSupplier').value.trim(),
+        priceKop: num(el('fPrice').value),
+        costKop: num(el('fCost').value),
+        adsKop: num(el('fAds').value),
+        status: el('fStatus').value,
+        paid: el('fPaid').value,
+        notes: el('fNotes').value.trim()
+      };
+      state.orders.unshift(order);
+      saveAll();
+      renderAll();
+      resetOrderForm();
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify({ orders: state.orders, stores: state.stores, suppliers: state.suppliers, user: state.user }, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      downloadUrl(url, `TopDr_backup_${new Date().toISOString().slice(0,10)}.json`);
+    }
+
+    function exportExcel() {
+      const rows = state.orders.map(o => ({
+        Дата: o.date || '',
+        Товар: o.product || '',
+        Магазин: o.store || '',
+        Клієнт: o.client || '',
+        Телефон: o.phone || '',
+        Постачальник: o.supplier || '',
+        Ціна_грн: (o.priceKop || 0) / 100,
+        Закупка_грн: (o.costKop || 0) / 100,
+        Реклама_грн: (o.adsKop || 0) / 100,
+        Прибуток_грн: ((o.priceKop || 0) - (o.costKop || 0) - (o.adsKop || 0)) / 100,
+        Статус: STATUS_LABELS[o.status] || o.status,
+        Оплата: o.paid === 'yes' ? 'Оплачено' : 'Не оплачено',
+        Коментар: o.notes || ''
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+      const fileName = `TopDr_backup_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    }
+
+    function downloadUrl(url, filename) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function handleTableAction(e) {
+      const act = e.target.dataset.act;
+      const id = e.target.dataset.id;
+      if (!act || !id) return;
+      const idx = state.orders.findIndex(o => o.id === id);
+      if (idx === -1) return;
+      if (act === 'delete') {
+        if (!confirm('Видалити замовлення?')) return;
+        state.orders.splice(idx, 1);
+      }
+      if (act === 'pay') {
+        state.orders[idx].paid = state.orders[idx].paid === 'yes' ? 'no' : 'yes';
+      }
+      saveAll();
       renderAll();
     }
-  }
 
-  function exportJSON() {
-    const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `topdr-crm-backup-${todayISO()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function importJSON(file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result);
-        if (!parsed || typeof parsed !== 'object') throw new Error('bad');
-        state.data.orders = Array.isArray(parsed.orders) ? parsed.orders : [];
-        state.data.suppliers = Array.isArray(parsed.suppliers) ? parsed.suppliers : ['Default Supplier'];
-        state.data.stores = Array.isArray(parsed.stores) ? parsed.stores : ['TopDr'];
-        save();
-        renderAll();
-        alert('Імпорт успішний ✅');
-      } catch (e) {
-        alert('Не вдалося імпортувати JSON');
+    function handleStatusChange(e) {
+      if (e.target.matches('select[data-act="status"]')) {
+        const id = e.target.dataset.id;
+        const order = state.orders.find(o => o.id === id);
+        if (!order) return;
+        order.status = e.target.value;
+        saveAll();
+        updateAnalytics();
       }
-    };
-    reader.readAsText(file);
-  }
-
-  function setRange(range) {
-    const now = new Date();
-    if (range === 'today') {
-      const iso = todayISO();
-      state.filters.from = iso;
-      state.filters.to = iso;
-    } else if (range === '7') {
-      const from = new Date(now); from.setDate(now.getDate() - 6);
-      state.filters.from = from.toISOString().slice(0,10);
-      state.filters.to = todayISO();
-    } else if (range === '30') {
-      const from = new Date(now); from.setDate(now.getDate() - 29);
-      state.filters.from = from.toISOString().slice(0,10);
-      state.filters.to = todayISO();
-    } else if (range === 'month') {
-      state.filters.from = monthStartISO();
-      state.filters.to = todayISO();
     }
-    els.from.value = state.filters.from;
-    els.to.value = state.filters.to;
-    renderAll();
-  }
 
-  function clearFilters() {
-    state.filters.search = '';
-    state.filters.from = '';
-    state.filters.to = '';
-    els.search.value = '';
-    els.from.value = '';
-    els.to.value = '';
-    renderAll();
-  }
+    function addStore() {
+      const name = el('newStoreName').value.trim();
+      if (!name) return alert('Вкажи назву магазину');
+      state.stores.push({ id: uid(), name, note: el('newStoreNote').value.trim(), tag: el('newStoreTag').value.trim() });
+      saveAll();
+      renderAll();
+      el('newStoreName').value = el('newStoreNote').value = el('newStoreTag').value = '';
+    }
 
-  function showTab(tab) {
-    state.activeTab = tab;
-    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    document.getElementById('dashboard').classList.toggle('hidden', tab !== 'dashboard');
-    document.getElementById('lists').classList.toggle('hidden', tab !== 'lists');
-    document.getElementById('backup').classList.toggle('hidden', tab !== 'backup');
-  }
+    function addSupplier() {
+      const name = el('newSupplierName').value.trim();
+      if (!name) return alert('Вкажи назву постачальника');
+      state.suppliers.push({ id: uid(), name, note: el('newSupplierNote').value.trim(), tag: el('newSupplierTag').value.trim() });
+      saveAll();
+      renderAll();
+      el('newSupplierName').value = el('newSupplierNote').value = el('newSupplierTag').value = '';
+    }
 
-  function escapeHtml(str) {
-    return (str ?? '').toString()
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+    function saveCreds() {
+      const u = el('setLogin').value.trim();
+      const p = el('setPass').value.trim();
+      if (!u || !p) return alert('Вкажи логін і пароль');
+      state.user = { username: u, password: p };
+      saveAll();
+      alert('Логін / пароль збережено');
+    }
 
-  function uid() {
-    return 'o_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
-  }
+    function clearAllData() {
+      if (!confirm('Точно очистити всі дані?')) return;
+      state.orders = [];
+      state.stores = [{ id: uid(), name: 'Основний магазин', note: 'За замовчуванням', tag: 'main' }];
+      state.suppliers = [{ id: uid(), name: 'Постачальник 1', note: 'За замовчуванням', tag: 's1' }];
+      saveAll();
+      renderAll();
+    }
 
-  // Events
-  els.openAdd.addEventListener('click', () => openAddForm());
-  els.closeModal.addEventListener('click', closeModal);
-  els.cancelEdit.addEventListener('click', closeModal);
-  els.modal.addEventListener('click', (e) => { if (e.target === els.modal) closeModal(); });
+    function syncFilterInputs() {
+      state.filters.search = el('searchOrder').value;
+      state.filters.store = el('filterStore').value;
+      state.filters.supplier = el('filterSupplier').value;
+      state.filters.status = el('filterStatus').value;
+      state.filters.from = el('filterFrom').value;
+      state.filters.to = el('filterTo').value;
 
-  els.orderForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const order = buildOrderFromForm();
-    saveOrder(order);
-    closeModal();
-  });
+      state.analyticsFilters.store = el('anStore').value;
+      state.analyticsFilters.supplier = el('anSupplier').value;
+      state.analyticsFilters.status = el('anStatus').value;
+      state.analyticsFilters.from = el('anFrom').value;
+      state.analyticsFilters.to = el('anTo').value;
+    }
 
-  els.search.addEventListener('input', () => {
-    state.filters.search = els.search.value;
-    renderAll();
-  });
-  els.from.addEventListener('change', () => {
-    state.filters.from = els.from.value;
-    renderAll();
-  });
-  els.to.addEventListener('change', () => {
-    state.filters.to = els.to.value;
-    renderAll();
-  });
-  els.clearFilters.addEventListener('click', clearFilters);
+    function resetAnalyticsFilters() {
+      ['anStore','anSupplier','anStatus','anFrom','anTo'].forEach(id => el(id).value = (id === 'anStatus') ? 'all' : 'all');
+      el('anStore').value = 'all';
+      el('anSupplier').value = 'all';
+      el('anStatus').value = 'all';
+      el('anFrom').value = '';
+      el('anTo').value = '';
+      syncFilterInputs();
+      renderAll();
+    }
 
-  document.querySelectorAll('[data-range]').forEach(btn => {
-    btn.addEventListener('click', () => setRange(btn.dataset.range));
-  });
+    function bindEvents() {
+      document.querySelectorAll('.nav button[data-tab]').forEach(btn => btn.addEventListener('click', () => {
+        setTab(btn.dataset.tab);
+        syncFilterInputs();
+        renderAll();
+      }));
 
-  document.querySelectorAll('.nav button').forEach(btn => {
-    btn.addEventListener('click', () => showTab(btn.dataset.tab));
-  });
+      el('btnLogin').addEventListener('click', () => {
+        if (login(el('loginUser').value.trim(), el('loginPass').value)) {
+          setSession(true);
+          showApp();
+          setTab('orders');
+          renderAll();
+        } else {
+          alert('Невірний логін або пароль');
+        }
+      });
 
-  els.addSupplierBtn.addEventListener('click', () => {
-    addSimpleListItem('supplier', els.newSupplier.value);
-    els.newSupplier.value = '';
-  });
+      el('btnSeed').addEventListener('click', () => {
+        state.user = { username: 'admin', password: '1234' };
+        saveAll();
+        el('loginUser').value = 'admin';
+        el('loginPass').value = '1234';
+        alert('Створено доступ admin / 1234');
+      });
 
-  els.addStoreBtn.addEventListener('click', () => {
-    addSimpleListItem('store', els.newStore.value);
-    els.newStore.value = '';
-  });
+      el('logoutBtn').addEventListener('click', () => {
+        setSession(false);
+        showLogin();
+      });
 
-  els.exportBtn.addEventListener('click', exportJSON);
-  els.importFile.addEventListener('change', (e) => {
-    const file = e.target.files?.[0];
-    if (file) importJSON(file);
-    e.target.value = '';
-  });
-  els.resetBtn.addEventListener('click', () => {
-    if (!confirm('Очистити всі дані?')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    state.data = { orders: [], suppliers: ['Default Supplier'], stores: ['TopDr'] };
-    renderAll();
-  });
+      el('addOrderBtn').addEventListener('click', addOrder);
+      el('resetOrderBtn').addEventListener('click', resetOrderForm);
+      el('openAddBtn').addEventListener('click', () => {
+        setTab('orders');
+        el('fProduct').focus();
+      });
 
-  // Seed data for first run
-  function seedIfEmpty() {
-    if (state.data.orders.length) return;
-    const demo = [
-      { product:'Гойдалка садова 4 місна', store:'TopDr', client:'Іван Петренко', phone:'+380671112233', city:'Київ', delivery:'Нова Пошта', price:15990, cost:10400, ads:1200, adSource:'Prom', supplier:'GardenPro', date:todayISO(), status:'new', paid:false, notes:'Передзвонити після 18:00' },
-      { product:'Ігрове крісло GT', store:'TopDr', client:'Марія К.', phone:'+380931112244', city:'Львів', delivery:'Укрпошта', price:6990, cost:4200, ads:500, adSource:'Prom', supplier:'OfficeLine', date:todayISO(), status:'processing', paid:true, notes:'' },
-      { product:'Батут 305 см', store:'TopDr', client:'Олег', phone:'+380991112255', city:'Одеса', delivery:'Нова Пошта', price:12490, cost:8500, ads:800, adSource:'Prom', supplier:'SportHub', date:todayISO(), status:'shipped', paid:false, notes:'Доставка на відділення' },
-      { product:'Крапельний полив', store:'TopDr', client:'Аліна', phone:'+380501112266', city:'Дніпро', delivery:'Нова Пошта', price:2490, cost:1090, ads:220, adSource:'Prom', supplier:'AgroLine', date:todayISO(), status:'done', paid:true, notes:'' },
-    ];
-    state.data.orders = demo.map(d => ({ ...d, id: uid(), createdAt: Date.now() - Math.floor(Math.random()*1000000) }));
-    state.data.suppliers = ['GardenPro','OfficeLine','SportHub','AgroLine','Default Supplier'];
-    state.data.stores = ['TopDr','Main Store'];
-    save();
-  }
+      el('exportBtn').addEventListener('click', exportExcel);
+      el('exportJsonBtn').addEventListener('click', exportJSON);
+      el('exportExcelBtn2').addEventListener('click', exportExcel);
+      el('importBtn').addEventListener('click', () => el('importFile').click());
+      el('importFile').addEventListener('change', handleImportJSON);
 
-  seedIfEmpty();
-  load();
-  renderAll();
-  els.date.value = todayISO();
+      el('searchOrder').addEventListener('input', () => { syncFilterInputs(); renderOrders(); });
+      ['filterStore','filterSupplier','filterStatus','filterFrom','filterTo'].forEach(id => el(id).addEventListener('change', () => { syncFilterInputs(); renderOrders(); }));
+      ['anStore','anSupplier','anStatus','anFrom','anTo'].forEach(id => el(id).addEventListener('change', () => { syncFilterInputs(); updateAnalytics(); }));
+      el('anReset').addEventListener('click', resetAnalyticsFilters);
 
-})();
-</script>
+      el('ordersBody').addEventListener('click', handleTableAction);
+      el('ordersBody').addEventListener('change', handleStatusChange);
+      el('addStoreBtn').addEventListener('click', addStore);
+      el('addSupplierBtn').addEventListener('click', addSupplier);
+      el('saveCredsBtn').addEventListener('click', saveCreds);
+      el('clearBtn').addEventListener('click', clearAllData);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !el('app').classList.contains('hidden') && state.tab === 'orders') {
+          const active = document.activeElement;
+          const isInput = active && ['INPUT','SELECT','TEXTAREA'].includes(active.tagName);
+          if (isInput && active.id !== 'searchOrder') {
+            // avoid accidental submits from filters/search
+          }
+        }
+      });
+    }
+
+    async function handleImportJSON(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.orders) state.orders = parsed.orders;
+        if (parsed.stores) state.stores = parsed.stores;
+        if (parsed.suppliers) state.suppliers = parsed.suppliers;
+        if (parsed.user) state.user = parsed.user;
+        saveAll();
+        renderAll();
+        alert('Імпорт успішний');
+      } catch (err) {
+        alert('Не вдалося імпортувати JSON');
+      } finally {
+        e.target.value = '';
+      }
+    }
+
+    function start() {
+      const session = loadData();
+      initDefaults();
+      bindEvents();
+      resetOrderForm();
+      syncFilterInputs();
+      if (session && isLogged()) {
+        showApp();
+        renderAll();
+      } else {
+        showLogin();
+      }
+    }
+
+    start();
+  </script>
 </body>
 </html>
