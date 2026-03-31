@@ -805,7 +805,7 @@ function updateAnalytics(){
   el('supplierCount').textContent = appState.suppliers.length;
 }
 
-function renderLists(){
+function renderAll(){
   el('storesList').innerHTML = appState.stores.map(s => `
     <div class="list-item">
       <div><b>${safe(s.name)}</b><div class="small">${safe(s.note || '')}${s.tag ? ' · ' + safe(s.tag) : ''}</div></div>
@@ -833,7 +833,7 @@ document.addEventListener('click', async (e) => {
 
     appState.stores = appState.stores.filter(s => s.id !== id);
     await saveData();
-    renderLists();
+    renderAll();
   }
 
   // 🏭 Постачальник
